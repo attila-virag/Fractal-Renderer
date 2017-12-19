@@ -9,15 +9,12 @@ class Zoom {
 	// scale on either side of center
 	double zoom{ 1 };
 
-	// will always create a square picture
-	int pixels{ 500 };
-
 
 	// completely arbitrary guesstimate function, can be changed
 	int GetRecommendedIterations() {
 
 		double scale = pixels / (2 * zoom);
-		return 50 * pow(log(scale), 1.25);
+		return (int)(50 * pow(log(scale), 1.25));
 	}
 
 public:
@@ -27,7 +24,7 @@ public:
 		x_min = x_center - zoom;
 		x_max = x_center + zoom;
 		y_min = y_center - zoom;
-		y_max - y_center + zoom;
+		y_max = y_center + zoom;
 
 		recommendedIterations = GetRecommendedIterations();
 	}
@@ -41,7 +38,7 @@ public:
 		x_min = x_center - zoom;
 		x_max = x_center + zoom;
 		y_min = y_center - zoom;
-		y_max - y_center + zoom;
+		y_max = y_center + zoom;
 
 		recommendedIterations = GetRecommendedIterations();
 	}
@@ -51,7 +48,7 @@ public:
 		x_min = x_center - zoom;
 		x_max = x_center + zoom;
 		y_min = y_center - zoom;
-		y_max - y_center + zoom;
+		y_max = y_center + zoom;
 
 		recommendedIterations = GetRecommendedIterations();
 	}
@@ -63,6 +60,8 @@ public:
 
 	double x_increment{ 0 };
 	double y_increment{ 0 };
+	// will always create a square picture
+	int pixels{ 500 };
 
 	// guesstimate based on zoom level and pizels etc
 	int recommendedIterations{ 100 };

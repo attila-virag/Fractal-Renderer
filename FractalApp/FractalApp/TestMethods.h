@@ -1,8 +1,12 @@
 #pragma once
 
-// Test Functions
+// Test Functions - just to exersize code
 
 #include "ColorPalette.h"
+#include "Zoom.h"
+#include "FractalAlgorithm.h"
+#include "CalculationProcessor.h"
+
 
 void TestRunColorInterpolate() {
 
@@ -17,4 +21,18 @@ void TestRunColorInterpolate() {
 	mag = .7777;
 
 	color.GetColor(mag, red, green, blue);
+}
+
+void TestCreatePaletterBitmap() {
+
+	Zoom zoom;
+	ColorPalette color;
+	FractalAlgorithm alg(zoom, color);
+
+	alg.algoType = AlgorithmType::ShowColorPalette;
+
+	CalculationProcessor proc(&alg, 8);
+	
+	proc.CreatePicture();
+
 }
