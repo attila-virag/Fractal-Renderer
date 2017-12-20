@@ -7,6 +7,8 @@ struct Result {
 	int y_coordinate;
 
 	double magnitude; // could mean differnet things depending on the algorithm but should be between 0-1 before passed into the palette
+
+	bool escaped;
 };
 
 typedef void(*FractalFunction)(Result *r);
@@ -19,16 +21,33 @@ enum class AlgorithmType {
 
 };
 
+enum class ColorScheme {
+
+	IterationCount,
+	EscapeAngle,
+	FinalMagnitude
+};
+
 class FractalAlgorithm {
 
 	void ShowColorPalette(Result* pt);
 
+	void MandelBrotSet(Result * pt);
+
+	const double PI = 3.14159;
+
+	double topMagnitude = 0;
+
 public:
+
+	double m_pow{ 2 };
+
 	Zoom m_zoom;
 
 	ColorPalette m_color;
 
 	AlgorithmType algoType = AlgorithmType::ShowColorPalette;
+	ColorScheme colorScheme = ColorScheme::EscapeAngle;
 
 	FractalAlgorithm(Zoom &zoom, ColorPalette & palette);
 

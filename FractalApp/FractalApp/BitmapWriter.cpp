@@ -126,9 +126,9 @@ bool BitmapWriter::WriteBitmap(const char* filename)
 		for (x = 0; x <= m_width - 1; x++)
 		{
 
-			red = m_redData[x][y];
-			green = m_greenData[x][y];
-			blue = m_blueData[x][y];
+			red = m_redData[y][x];
+			green = m_greenData[y][x];
+			blue = m_blueData[y][x];
 
 			if (red > 255) red = 255; if (red < 0) red = 0;
 			if (green > 255) green = 255; if (green < 0) green = 0;

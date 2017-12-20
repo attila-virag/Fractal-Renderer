@@ -74,12 +74,16 @@ void CalculationProcessor::ProcessResult() {
 
 		auto p = GetNextResult();
 		if (p == nullptr) break;
-		// apply normalization method here
+		
+		m_algo->GetNormalization(p.get());
 
-		int red, green, blue;
+		int red = 0;
+		int green = 0;
+		int blue = 0;
 
-		m_algo->m_color.GetColor(p->magnitude, red, green, blue);
-
+		if (p->escaped) {
+			m_algo->m_color.GetColor(p->magnitude, red, green, blue);
+		}
 		m_redData[p->x_coordinate][p->y_coordinate] = red;
 		m_greenData[p->x_coordinate][p->y_coordinate] = green;
 		m_blueData[p->x_coordinate][p->y_coordinate] = blue;
@@ -88,6 +92,7 @@ void CalculationProcessor::ProcessResult() {
 
 	}
 }
+
 
 void CalculationProcessor::PreparePoints()
 {
@@ -102,7 +107,7 @@ void CalculationProcessor::PreparePoints()
 			tempGreen.push_back(0);
 			tempBlue.push_back(0);
 
-			AddPointToQueue(h, w);
+			AddPointToQueue(w, h);
 		}
 
 		m_redData.push_back(tempRed);

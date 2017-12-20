@@ -36,3 +36,20 @@ void TestCreatePaletterBitmap() {
 	proc.CreatePicture();
 
 }
+
+void TestCreateMandelBrot() {
+	Zoom zoom;
+
+	zoom.ResetZoom(-0.5, 0, 1.5, 1000);
+
+	ColorPalette color;
+	FractalAlgorithm alg(zoom, color);
+
+	alg.algoType = AlgorithmType::MandelBrot;
+	alg.colorScheme = ColorScheme::FinalMagnitude;
+
+	CalculationProcessor proc(&alg, 8);
+
+	proc.CreatePicture();
+
+}

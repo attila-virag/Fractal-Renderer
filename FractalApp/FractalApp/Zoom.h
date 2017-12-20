@@ -7,7 +7,7 @@ class Zoom {
 	double y_center{ 0 };
 
 	// scale on either side of center
-	double zoom{ 1 };
+	double zoom{ 1.5 };
 
 
 	// completely arbitrary guesstimate function, can be changed
@@ -25,6 +25,8 @@ public:
 		x_max = x_center + zoom;
 		y_min = y_center - zoom;
 		y_max = y_center + zoom;
+		x_increment = (x_max - x_min) / (double)pixels;
+		y_increment = (y_max - y_min) / (double)pixels;
 
 		recommendedIterations = GetRecommendedIterations();
 	}
@@ -41,14 +43,22 @@ public:
 		y_max = y_center + zoom;
 
 		recommendedIterations = GetRecommendedIterations();
+		x_increment = (x_max - x_min) / (double)pixels;
+		y_increment = (y_max - y_min) / (double)pixels;
 	}
 
 	//
-	void ResetZoom(double x_center, double y_center, double zoom) {
+	void ResetZoom(double x_center, double y_center, double zoom, int pls) {
 		x_min = x_center - zoom;
 		x_max = x_center + zoom;
 		y_min = y_center - zoom;
 		y_max = y_center + zoom;
+
+		pixels = pls;
+
+		x_increment = (x_max - x_min) / (double)pixels;
+		y_increment = (y_max - y_min) / (double)pixels;
+
 
 		recommendedIterations = GetRecommendedIterations();
 	}
