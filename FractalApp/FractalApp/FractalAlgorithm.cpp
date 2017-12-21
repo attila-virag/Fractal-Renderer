@@ -8,13 +8,13 @@ using std::complex;
 
 void FractalAlgorithm::ShowColorPalette(Result * pt)
 {
-	pt->magnitude = pt->x_coordinate / (double)m_zoom.pixels;
+	pt->magnitude = pt->x_coordinate / (double)m_zoom->pixels;
 }
 
 void FractalAlgorithm::MandelBrotSet(Result * pt)
 {
-	double x_point = m_zoom.x_min + pt->x_coordinate*m_zoom.x_increment;
-	double y_point = m_zoom.y_min + pt->y_coordinate*m_zoom.y_increment;
+	double x_point = m_zoom->x_min + pt->x_coordinate*m_zoom->x_increment;
+	double y_point = m_zoom->y_min + pt->y_coordinate*m_zoom->y_increment;
 
 	int iteration = 0;
 	double normalizedIteration = 0;
@@ -26,7 +26,7 @@ void FractalAlgorithm::MandelBrotSet(Result * pt)
 
 	pt->escaped = false;
 
-	while (iteration < m_zoom.recommendedIterations) {
+	while (iteration < m_zoom->recommendedIterations) {
 		z = std::pow(z, m_pow) + c;
 
 		 magnitude = abs(z);
@@ -35,7 +35,7 @@ void FractalAlgorithm::MandelBrotSet(Result * pt)
 
 			escapeAngle = arg(z) / PI;
 
-			normalizedIteration = sqrt((iteration / (double)m_zoom.recommendedIterations));
+			normalizedIteration = sqrt((iteration / (double)m_zoom->recommendedIterations));
 
 			if (topMagnitude < magnitude)
 				topMagnitude = magnitude;
@@ -71,7 +71,7 @@ void FractalAlgorithm::GetNormalization(Result* pt) {
 }
 
 
-FractalAlgorithm::FractalAlgorithm(Zoom & zoom, ColorPalette & palette):
+FractalAlgorithm::FractalAlgorithm(Zoom * zoom, ColorPalette * palette):
 	m_zoom(zoom),
 	m_color(palette)
 {

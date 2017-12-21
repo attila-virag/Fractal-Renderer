@@ -287,3 +287,4 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 /FractalApp/FractalApp/README.txt
+/FractalApp/FractalApp/palette.txt

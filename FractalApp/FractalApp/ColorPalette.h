@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <vector>
+#include <random>
 
 // This class creates a cyclic color palette from preset rgb values
 // input range between 0 and 1
@@ -15,6 +16,8 @@ class ColorPalette {
 	array<int, 5> Rvalues;
 	array<int, 5> Gvalues;
 	array<int, 5> Bvalues;
+
+	std::random_device rd;
 
 
 	void SetDefaultPalette() {
@@ -42,15 +45,25 @@ class ColorPalette {
 
 	void LinearInterpolate(double magnitude, int &redValue, int& greenValue, int& blueValue);
 
+	int GetRandomColor(); // returns value between 0 -255
+
 public:
 
 	ColorPalette() {
 		SetDefaultPalette();
 	}
-	ColorPalette(vector<int> red, vector<int> green, vector<int> blue);
+	ColorPalette(ColorPalette &orig){}
+
+	void EnterPalette(vector<int> red, vector<int> green, vector<int> blue);
 
 	void GetColor(double magnitude, int &redValue, int &greenValue, int &blueValue) {
 		LinearInterpolate(magnitude, redValue, greenValue, blueValue);
 	}
+
+	void SavePaletteToFile();
+
+	void LoadPaletteFromFile();
+
+	void GenerateRandomColorPalette();
 
 };

@@ -1,5 +1,11 @@
 #include "stdafx.h"
 #include "ColorPalette.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using std::cout;
+
 
 void ColorPalette::LinearInterpolate(double magnitude, int & rValue, int & gValue, int & bValue)
 {
@@ -66,11 +72,98 @@ void ColorPalette::LinearInterpolate(double magnitude, int & rValue, int & gValu
 
 }
 
-ColorPalette::ColorPalette(vector<int> red, vector<int> green, vector<int> blue)
+int ColorPalette::GetRandomColor()
+{
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<double> dis(0, 257);
+
+	return (int)(floor(dis(rd)));
+}
+
+void ColorPalette::EnterPalette(vector<int> red, vector<int> green, vector<int> blue)
 {
 	for (int i = 0; i < 5; i++) {
 		Rvalues[i] = red[i];
 		Gvalues[i] = green[i];
 		Bvalues[i] = blue[i];
+	}
+}
+
+void ColorPalette::SavePaletteToFile()
+{
+	std::ofstream outFile;
+
+	outFile.open("palette.txt");
+
+	if (outFile.is_open()) {
+
+
+		outFile << "Red Values: " << std::endl;
+
+		for (int i = 0; i < 5; i++) {
+			outFile << Rvalues[i] << std::endl;
+		}
+
+		outFile << "Green Values: " << std::endl;
+
+		for (int i = 0; i < 5; i++) {
+			outFile << Gvalues[i] << std::endl;
+		}
+
+		outFile << "Blue Values: " << std::endl;
+
+		for (int i = 0; i < 5; i++) {
+			outFile << Bvalues[i] << std::endl;
+		}
+
+		outFile.close();
+	}
+	else
+	{
+		cout << "Could not open file" << std::endl;
+	}
+}
+
+void ColorPalette::LoadPaletteFromFile()
+{
+	std::ifstream inFile;
+
+	inFile.open("palette.txt");
+
+	std::string line;
+
+	if (inFile.is_open()) {
+		
+		getline(inFile, line);
+
+		for (int i = 0; i < 5; i++) {
+			inFile >> Rvalues[i];
+		}
+
+		getline(inFile, line);
+		getline(inFile, line);
+
+		for (int i = 0; i < 5; i++) {
+			inFile >> Gvalues[i];
+		}
+
+		getline(inFile, line);
+		getline(inFile, line);
+		
+		for (int i = 0; i < 5; i++) {
+			inFile >> Bvalues[i];
+		}
+		
+		inFile.close();
+	}
+
+}
+
+void ColorPalette::GenerateRandomColorPalette()
+{
+	for (int i = 0; i < 5; i++) {
+		Rvalues[i] = GetRandomColor();
+		Gvalues[i] = GetRandomColor();
+		Bvalues[i] = GetRandomColor();
 	}
 }

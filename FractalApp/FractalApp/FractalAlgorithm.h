@@ -42,14 +42,14 @@ public:
 
 	double m_pow{ 2 };
 
-	Zoom m_zoom;
+	Zoom* m_zoom;
 
-	ColorPalette m_color;
+	ColorPalette* m_color;
 
 	AlgorithmType algoType = AlgorithmType::ShowColorPalette;
 	ColorScheme colorScheme = ColorScheme::EscapeAngle;
 
-	FractalAlgorithm(Zoom &zoom, ColorPalette & palette);
+	FractalAlgorithm(Zoom *zoom, ColorPalette * palette);
 
 	// this method will run in multiple threads
 	void CalculatePoint(Result* pt);

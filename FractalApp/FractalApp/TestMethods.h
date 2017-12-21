@@ -23,11 +23,34 @@ void TestRunColorInterpolate() {
 	color.GetColor(mag, red, green, blue);
 }
 
+void TestCreateRandomPaletteAndSave() {
+	Zoom zoom;
+	ColorPalette color;
+
+	color.GenerateRandomColorPalette();
+
+	color.SavePaletteToFile();
+
+	FractalAlgorithm alg(&zoom, &color);
+	alg.algoType == AlgorithmType::ShowColorPalette;
+
+	CalculationProcessor proc(&alg, 8);
+
+	proc.CreatePicture();
+
+	color.LoadPaletteFromFile();
+}
+
+void TestLoadPaletteFromFile() {
+	ColorPalette color;
+	color.LoadPaletteFromFile();
+}
+
 void TestCreatePaletterBitmap() {
 
 	Zoom zoom;
 	ColorPalette color;
-	FractalAlgorithm alg(zoom, color);
+	FractalAlgorithm alg(&zoom, &color);
 
 	alg.algoType = AlgorithmType::ShowColorPalette;
 
@@ -43,7 +66,7 @@ void TestCreateMandelBrot() {
 	zoom.ResetZoom(-0.5, 0, 1.5, 1000);
 
 	ColorPalette color;
-	FractalAlgorithm alg(zoom, color);
+	FractalAlgorithm alg(&zoom, &color);
 
 	alg.algoType = AlgorithmType::MandelBrot;
 	alg.colorScheme = ColorScheme::FinalMagnitude;

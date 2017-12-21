@@ -81,8 +81,8 @@ void CalculationProcessor::ProcessResult() {
 		int green = 0;
 		int blue = 0;
 
-		if (p->escaped) {
-			m_algo->m_color.GetColor(p->magnitude, red, green, blue);
+		if (p->escaped || m_algo->algoType == AlgorithmType::ShowColorPalette) {
+			m_algo->m_color->GetColor(p->magnitude, red, green, blue);
 		}
 		m_redData[p->x_coordinate][p->y_coordinate] = red;
 		m_greenData[p->x_coordinate][p->y_coordinate] = green;
@@ -96,13 +96,13 @@ void CalculationProcessor::ProcessResult() {
 
 void CalculationProcessor::PreparePoints()
 {
-	for (int h = 0; h < m_algo->m_zoom.pixels; h++) {
+	for (int h = 0; h < m_algo->m_zoom->pixels; h++) {
 
 		vector<int> tempRed;
 		vector<int> tempGreen;
 		vector<int> tempBlue;
 
-		for (int w = 0; w < m_algo->m_zoom.pixels; w++) {
+		for (int w = 0; w < m_algo->m_zoom->pixels; w++) {
 			tempRed.push_back(0);
 			tempGreen.push_back(0);
 			tempBlue.push_back(0);
@@ -120,7 +120,7 @@ void CalculationProcessor::PreparePoints()
 void CalculationProcessor::WriteImage()
 {
 	// order red, blue, green
-	BitmapWriter bp(m_redData, m_blueData, m_greenData, m_algo->m_zoom.pixels, m_algo->m_zoom.pixels);
+	BitmapWriter bp(m_redData, m_blueData, m_greenData, m_algo->m_zoom->pixels, m_algo->m_zoom->pixels);
 
 	bp.WriteBitmap("GeneratedImage.bmp");
 
