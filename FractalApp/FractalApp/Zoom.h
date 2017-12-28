@@ -3,13 +3,6 @@
 
 class Zoom {
 
-	double x_center{ 0 };
-	double y_center{ 0 };
-
-	// scale on either side of center
-	double zoom{ 1.5 };
-
-
 	// completely arbitrary guesstimate function, can be changed
 	int GetRecommendedIterations() {
 
@@ -18,6 +11,12 @@ class Zoom {
 	}
 
 public:
+
+	double x_center{ 0 };
+	double y_center{ 0 };
+
+	// scale on either side of center
+	double zoom{ 1.5 };
 
 	Zoom() {
 

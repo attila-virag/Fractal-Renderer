@@ -1,6 +1,7 @@
 #pragma once
 #include "Zoom.h"
 #include "ColorPalette.h"
+#include <complex>
 
 struct Result {
 	int x_coordinate;
@@ -24,6 +25,7 @@ enum class AlgorithmType {
 enum class ColorScheme {
 
 	IterationCount,
+	HistogramCount,
 	EscapeAngle,
 	FinalMagnitude
 };
@@ -38,6 +40,10 @@ class FractalAlgorithm {
 
 	double topMagnitude = 0;
 
+	double NormalizeIterations(int iterations, std::complex<double> Zn, std::complex<double> C);
+
+	//double GetHistogram
+
 public:
 
 	double m_pow{ 2 };
@@ -45,6 +51,9 @@ public:
 	Zoom* m_zoom;
 
 	ColorPalette* m_color;
+
+	double max_mag = 0;
+	double min_mag = 0;
 
 	AlgorithmType algoType = AlgorithmType::ShowColorPalette;
 	ColorScheme colorScheme = ColorScheme::EscapeAngle;

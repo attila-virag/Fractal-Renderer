@@ -33,9 +33,9 @@ void FractalAlgorithm::MandelBrotSet(Result * pt)
 
 		if (magnitude > 4) {
 
-			escapeAngle = arg(z) / PI;
+			escapeAngle = arg(z) / 2*PI;
 
-			normalizedIteration = sqrt((iteration / (double)m_zoom->recommendedIterations));
+			normalizedIteration = NormalizeIterations(iteration, z, c);
 
 			if (topMagnitude < magnitude)
 				topMagnitude = magnitude;
@@ -61,11 +61,35 @@ void FractalAlgorithm::MandelBrotSet(Result * pt)
 	
 }
 
+double FractalAlgorithm::NormalizeIterations(int iterations, complex<double> Zn, complex<double> C)
+{
+	int extraIter = 0;
+
+	for (; extraIter < 3; extraIter++) {
+		Zn = std::pow(Zn, m_pow) + C;
+	}
+
+	auto nd = log(log(abs(Zn))) / log(m_pow); // log((log(abs(Zn)) / log(2))) / log(m_pow);
+
+	auto sn = iterations+extraIter+1 - nd;
+
+	if (sn < min_mag)
+		min_mag = sn;
+	if (sn > max_mag)
+		max_mag = sn;
+
+	return sn;
+}
+
 void FractalAlgorithm::GetNormalization(Result* pt) {
 
 	if (colorScheme == ColorScheme::FinalMagnitude)
 	{
-		pt->magnitude = sqrt(pt->magnitude / topMagnitude);
+		pt->magnitude = sqrt(sqrt(pt->magnitude / topMagnitude));
+	}
+	else if (colorScheme == ColorScheme::IterationCount)
+	{
+		pt->magnitude = (pt->magnitude - min_mag) / (max_mag - min_mag);
 	}
 
 }

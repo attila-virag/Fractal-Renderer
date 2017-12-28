@@ -29,21 +29,21 @@ void TestCreateRandomPaletteAndSave() {
 
 	color.GenerateRandomColorPalette();
 
-	color.SavePaletteToFile();
+	color.SavePaletteToFile("test");
 
 	FractalAlgorithm alg(&zoom, &color);
 	alg.algoType == AlgorithmType::ShowColorPalette;
 
 	CalculationProcessor proc(&alg, 8);
 
-	proc.CreatePicture();
+	proc.CreatePicture("testPicture");
 
-	color.LoadPaletteFromFile();
+	color.LoadPaletteFromFile("test");
 }
 
 void TestLoadPaletteFromFile() {
 	ColorPalette color;
-	color.LoadPaletteFromFile();
+	color.LoadPaletteFromFile("test");
 }
 
 void TestCreatePaletterBitmap() {
@@ -56,23 +56,26 @@ void TestCreatePaletterBitmap() {
 
 	CalculationProcessor proc(&alg, 8);
 	
-	proc.CreatePicture();
+	proc.CreatePicture("testPicture");
 
 }
 
 void TestCreateMandelBrot() {
 	Zoom zoom;
 
-	zoom.ResetZoom(-0.5, 0, 1.5, 1000);
+	//zoom.ResetZoom(-0.5, 0, 1.5, 1000);
+
+	zoom.ResetZoom(-1.7497219297, -0.000029016647, 0.001, 500);
 
 	ColorPalette color;
+	color.LoadPaletteFromFile("test");
 	FractalAlgorithm alg(&zoom, &color);
 
 	alg.algoType = AlgorithmType::MandelBrot;
-	alg.colorScheme = ColorScheme::FinalMagnitude;
+	alg.colorScheme = ColorScheme::IterationCount;
 
 	CalculationProcessor proc(&alg, 8);
 
-	proc.CreatePicture();
+	proc.CreatePicture("testPicture");
 
 }

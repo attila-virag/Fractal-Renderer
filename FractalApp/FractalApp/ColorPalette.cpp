@@ -89,11 +89,13 @@ void ColorPalette::EnterPalette(vector<int> red, vector<int> green, vector<int> 
 	}
 }
 
-void ColorPalette::SavePaletteToFile()
+void ColorPalette::SavePaletteToFile(std::string fileName)
 {
 	std::ofstream outFile;
 
-	outFile.open("palette.txt");
+	fileName = fileName + ".txt";
+
+	outFile.open(fileName);
 
 	if (outFile.is_open()) {
 
@@ -124,11 +126,11 @@ void ColorPalette::SavePaletteToFile()
 	}
 }
 
-void ColorPalette::LoadPaletteFromFile()
+bool ColorPalette::LoadPaletteFromFile(std::string fileName)
 {
 	std::ifstream inFile;
 
-	inFile.open("palette.txt");
+	inFile.open(fileName);
 
 	std::string line;
 
@@ -155,8 +157,9 @@ void ColorPalette::LoadPaletteFromFile()
 		}
 		
 		inFile.close();
+		return true;
 	}
-
+	else return false;
 }
 
 void ColorPalette::GenerateRandomColorPalette()

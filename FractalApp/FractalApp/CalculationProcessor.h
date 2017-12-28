@@ -32,10 +32,6 @@ private:
 	queue <unique_ptr<Result>> resultQueue;
 
 
-	FractalFunction m_func = nullptr;
-	FractalAlgorithm *m_algo = nullptr;
-
-
 	unsigned int m_concurrency{ 2 };
 
 	// passes a point in queue to thread
@@ -58,12 +54,15 @@ private:
 	void PreparePoints();
 
 	// single thread
-	void WriteImage();
+	void WriteImage(std::string fileName);
 
 public:
 
+	FractalFunction m_func = nullptr;
+	FractalAlgorithm *m_algo = nullptr;
+
 	CalculationProcessor(FractalAlgorithm* algo,  int threads = 0);
 
-	void CreatePicture();
+	void CreatePicture(std::string fileName);
 
 };

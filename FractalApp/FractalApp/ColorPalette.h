@@ -2,6 +2,7 @@
 #include <array>
 #include <vector>
 #include <random>
+#include <string>
 
 // This class creates a cyclic color palette from preset rgb values
 // input range between 0 and 1
@@ -60,9 +61,9 @@ public:
 		LinearInterpolate(magnitude, redValue, greenValue, blueValue);
 	}
 
-	void SavePaletteToFile();
+	void SavePaletteToFile(std::string fileName);
 
-	void LoadPaletteFromFile();
+	bool LoadPaletteFromFile(std::string fileName);
 
 	void GenerateRandomColorPalette();
 
