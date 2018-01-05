@@ -59,9 +59,11 @@ private:
 public:
 
 	FractalFunction m_func = nullptr;
-	FractalAlgorithm *m_algo = nullptr;
+	unique_ptr<FractalAlgorithm> m_algo = nullptr;
 
 	CalculationProcessor(FractalAlgorithm* algo,  int threads = 0);
+
+	~CalculationProcessor();
 
 	void CreatePicture(std::string fileName);
 

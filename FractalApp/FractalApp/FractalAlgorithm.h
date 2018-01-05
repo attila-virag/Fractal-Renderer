@@ -2,6 +2,7 @@
 #include "Zoom.h"
 #include "ColorPalette.h"
 #include <complex>
+#include <memory>
 
 struct Result {
 	int x_coordinate;
@@ -48,15 +49,15 @@ public:
 
 	double m_pow{ 2 };
 
-	Zoom* m_zoom;
+	std::unique_ptr<Zoom> m_zoom;
 
-	ColorPalette* m_color;
+	std::unique_ptr<ColorPalette> m_color;
 
 	double max_mag = 0;
 	double min_mag = 0;
 
-	AlgorithmType algoType = AlgorithmType::ShowColorPalette;
-	ColorScheme colorScheme = ColorScheme::EscapeAngle;
+	AlgorithmType algoType = AlgorithmType::MandelBrot;
+	ColorScheme colorScheme = ColorScheme::IterationCount;
 
 	FractalAlgorithm(Zoom *zoom, ColorPalette * palette);
 

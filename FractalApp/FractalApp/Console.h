@@ -26,6 +26,19 @@ void SetAlgorithm(CalculationProcessor * proc) {
 	default: proc->m_algo->algoType = AlgorithmType::MandelBrot; break;
 	}
 
+
+	cout << "Please enter a coloring algorithm option: " << std::endl;
+	cout << "1 = Iteration Count , 2 = Histogram Count, 3 = Escape Angle, 4 = Final magnitude " << std::endl;
+	cin >> option;
+
+	switch (option) {
+
+	case 1: proc->m_algo->colorScheme = ColorScheme::IterationCount; break;
+	case 2: proc->m_algo->colorScheme = ColorScheme::HistogramCount; break;
+	case 3: proc->m_algo->colorScheme = ColorScheme::EscapeAngle; break;
+	case 4: proc->m_algo->colorScheme = ColorScheme::FinalMagnitude; break;
+	default: proc->m_algo->colorScheme = ColorScheme::IterationCount; break;
+	}
 }
 
 void LoadColorPalette(CalculationProcessor * proc) {
@@ -112,6 +125,47 @@ void SetZoom(CalculationProcessor * proc) {
 
 }
 void RenderImage(CalculationProcessor * proc) {
+
+	std::string name = "";
+
+	cout << "Enter a filename or leave blank for default " << std::endl;
+	cin >> name;
+
+	if (name.length() == 0)
+		name = "fractal";
+
+	int done = 0;
+
+	while (done == 0) {
+
+		int preview = 0;
+		cout << "Enter 1 to generate 500X500 preview : " << std::endl;
+		cin >> preview;
+
+		if (preview == 1) {
+			auto pixels = proc->m_algo->m_zoom->pixels;
+
+			proc->m_algo->m_zoom->pixels = 500;
+
+			proc->CreatePicture(name + "_preview");
+
+			proc->m_algo->m_zoom->pixels = pixels;
+		}
+
+		cout << "Enter 1 to generate full image, enter 2 to change coordinates: " << std::endl;
+		cin >> done;
+
+		if (done == 1) {
+			proc->CreatePicture(name);
+		}
+		else if (done == 2) {
+			SetZoom(proc);
+		}
+
+		cout << "Enter 0 to continue or enter 1 to return to main menu" << std::endl;
+		cin >> done;
+
+	}
 
 }
 

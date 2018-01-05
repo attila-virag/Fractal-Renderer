@@ -119,7 +119,7 @@ void CalculationProcessor::PreparePoints()
 
 void CalculationProcessor::WriteImage(std::string fileName)
 {
-	fileName = fileName + ".bmp";
+	fileName = "images\\"+fileName + ".bmp";
 
 	// order red, blue, green
 	BitmapWriter bp(m_redData, m_blueData, m_greenData, m_algo->m_zoom->pixels, m_algo->m_zoom->pixels);
@@ -147,10 +147,17 @@ CalculationProcessor::CalculationProcessor(FractalAlgorithm* algo, int threads):
 	m_greenData.clear();
 }
 
+CalculationProcessor::~CalculationProcessor()
+{
+
+}
+
 void CalculationProcessor::CreatePicture(std::string fileName)
 {
 	// will create as many threads as derived from the conurency level and work throuhg the point queue
-
+	m_redData.clear();
+	m_blueData.clear();
+	m_greenData.clear();
 	
 	PreparePoints(); // generation could be its own thread
 
