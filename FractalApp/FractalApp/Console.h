@@ -3,95 +3,75 @@
 
 #include <iostream>
 #include <string>
-#include "ColorPalette.h"
-#include "Zoom.h"
-#include "FractalAlgorithm.h"
-#include "CalculationProcessor.h"
+
+#include "FractalEngine.h"
 
 using std::cout;
 using std::cin;
 
-void SetAlgorithm(CalculationProcessor * proc) {
+void SetAlgorithm(void * instPtr) {
 
 	int option = 1;
 
 	cout << "Please enter an algorithm option: " << std::endl;
-	cout << "1 = Mandelbrot , 2 = Julia Set " << std::endl;
+	cout << "1 = Mandelbrot , 2 = Julia Set, 10 = return to main menu " << std::endl;
+	cout << "=>";
 	cin >> option;
 
-	switch (option) {
+	if (option == 10) return;
 
-	case 1: proc->m_algo->algoType = AlgorithmType::MandelBrot; break;
-	case 2: proc->m_algo->algoType = AlgorithmType::JuliaSet; break;
-	default: proc->m_algo->algoType = AlgorithmType::MandelBrot; break;
-	}
+	SetAlgorithm(instPtr, option);
 
+	cout << "Algorithm was set to option: " << GetAlgorithm(instPtr) << std::endl;
 
 	cout << "Please enter a coloring algorithm option: " << std::endl;
-	cout << "1 = Iteration Count , 2 = Histogram Count, 3 = Escape Angle, 4 = Final magnitude " << std::endl;
+	cout << "1 = Iteration Count , 2 = Histogram Count, 3 = Escape Angle, 4 = Final magnitude, 10 = return to main menu  " << std::endl;
+	cout << "=>";
 	cin >> option;
 
-	switch (option) {
+	if (option == 10) return;
 
-	case 1: proc->m_algo->colorScheme = ColorScheme::IterationCount; break;
-	case 2: proc->m_algo->colorScheme = ColorScheme::HistogramCount; break;
-	case 3: proc->m_algo->colorScheme = ColorScheme::EscapeAngle; break;
-	case 4: proc->m_algo->colorScheme = ColorScheme::FinalMagnitude; break;
-	default: proc->m_algo->colorScheme = ColorScheme::IterationCount; break;
-	}
+	SetColorAlgorithm(instPtr, option);
+
+	cout << "Color algorithm was set to option: " << GetColorAlgorithm(instPtr) << std::endl;
 }
 
-void LoadColorPalette(CalculationProcessor * proc) {
+void LoadColorPalette(void * instPtr) {
 
 	std::string fileName;
 	cout << "Please enter the color palette file Name: " << std::endl;
 	cin >> fileName;
 
-	if (!proc->m_algo->m_color->LoadPaletteFromFile(fileName)) {
+	if (!LoadColorPaletteFromFile(instPtr, fileName.c_str())) {
 		cout << "File not found, using default palette. " << std::endl;
 	}
 	else {
 		cout << "Palette Loaded. " << std::endl;
 	}
 }
-void GenerateRandomPalette(CalculationProcessor * proc) {
+void GenerateRandomPalette(void* instPtr) {
 
 	int good = 0;
 
-	auto algoType = proc->m_algo->algoType;
-	proc->m_algo->algoType = AlgorithmType::ShowColorPalette;
-
-	double x_center = proc->m_algo->m_zoom->x_center;
-	double y_center = proc->m_algo->m_zoom->y_center;
-	double zoom = proc->m_algo->m_zoom->zoom;
-
-	proc->m_algo->m_zoom->ResetZoom(.5, .5, .5, proc->m_algo->m_zoom->pixels);
-
 	while (good == 0) {
 
-		proc->m_algo->m_color->GenerateRandomColorPalette();
-
-		proc->CreatePicture("randomColorPalette");
+		GenerateRandomColorPalette(instPtr);
 
 		cout << "Please see the file randomColorPalette.bmp and enter 1 to keep palette or enter 0 to generate another random palette. " << std::endl;
 		cin >> good;
 
 	}
-
-	proc->m_algo->algoType = algoType;
-	proc->m_algo->m_zoom->ResetZoom(x_center, y_center, zoom, proc->m_algo->m_zoom->pixels);
-
 }
 
-void SavePalette(CalculationProcessor * proc) {
+void SavePalette(void * instPtr) {
 	std::string name;
 	cout << "Please enter a file name without extension. " << std::endl;
 	cin >> name;
 
-	proc->m_algo->m_color->SavePaletteToFile(name);
+	SaveColorPalette(instPtr, name.c_str());
 }
 
-void SetPalette(CalculationProcessor * proc) {
+void SetPalette(void * proc) {
 
 	int option = 1;
 
@@ -108,23 +88,25 @@ void SetPalette(CalculationProcessor * proc) {
 	}
 
 }
-void SetZoom(CalculationProcessor * proc) {
+void SetZoom(void * proc) {
 	double x_center, y_center, zoom;
 	int pixels;
 
-	cout << "Please enter x - coordinate: " << std::endl;
-	cin >> x_center;
-	cout << "Please enter y - coordinate: " << std::endl;
-	cin >> y_center;
-	cout << "Please enter zoom scale: " << std::endl;
-	cin >> zoom;
-	cout << "Please enter pixels (larger than 2000 will take long to generate): " << std::endl;
-	cin >> pixels;
+	// has to be fixed to take each value separately
 
-	proc->m_algo->m_zoom->ResetZoom(x_center, y_center, zoom, pixels);
+	//cout << "Please enter x - coordinate: " << std::endl;
+	//cin >> x_center;
+	//cout << "Please enter y - coordinate: " << std::endl;
+	//cin >> y_center;
+	//cout << "Please enter zoom scale: " << std::endl;
+	//cin >> zoom;
+	//cout << "Please enter pixels (larger than 2000 will take long to generate): " << std::endl;
+	//cin >> pixels;
+
+	//proc->m_algo->m_zoom->ResetZoom(x_center, y_center, zoom, pixels);
 
 }
-void RenderImage(CalculationProcessor * proc) {
+void RenderImage(void * proc) {
 
 	std::string name = "";
 
@@ -143,23 +125,23 @@ void RenderImage(CalculationProcessor * proc) {
 		cin >> preview;
 
 		if (preview == 1) {
-			auto pixels = proc->m_algo->m_zoom->pixels;
+			//auto pixels = proc->m_algo->m_zoom->pixels;
 
-			proc->m_algo->m_zoom->pixels = 500;
+			//proc->m_algo->m_zoom->pixels = 500;
 
-			proc->CreatePicture(name + "_preview");
+			//proc->CreatePicture(name + "_preview");
 
-			proc->m_algo->m_zoom->pixels = pixels;
+			//proc->m_algo->m_zoom->pixels = pixels;
 		}
 
 		cout << "Enter 1 to generate full image, enter 2 to change coordinates: " << std::endl;
 		cin >> done;
 
 		if (done == 1) {
-			proc->CreatePicture(name);
+			//proc->CreatePicture(name);
 		}
 		else if (done == 2) {
-			SetZoom(proc);
+			//SetZoom(proc);
 		}
 
 		cout << "Enter 0 to continue or enter 1 to return to main menu" << std::endl;
@@ -172,31 +154,33 @@ void RenderImage(CalculationProcessor * proc) {
 
 void Console() {
 
-	Zoom zoom;
-	ColorPalette color;
-	FractalAlgorithm alg(&zoom, &color);
+	void* instPtr = nullptr;
 
-	CalculationProcessor proc(&alg);
+	if (CreateFractalEngine(&instPtr)) {
 
-	while (true) {
+		while (true) {
 
-		int option = 0;
+			int option = 0;
 
-		cout << "Please enter an option: " << std::endl;
-		cout << "1 = Set algorithm , 2 = Set Palette, 3 = Set Zoom, 4 = Render Image, 10 = exit" << std::endl;
-		cin >> option;
+			cout << "Please enter an option: " << std::endl;
+			cout << "1 = Set algorithm , 2 = Set Palette, 3 = Set Zoom, 4 = Render Image, 10 = exit" << std::endl;
+			cout << "=>";
+			cin >> option;
 
-		switch (option) {
+			switch (option) {
 
 			case 10: break;
-			case 1: SetAlgorithm(&proc); continue;
-			case 2: SetPalette(&proc); continue;
-			case 3: SetZoom(&proc); continue;
-			case 4: RenderImage(&proc); continue;
+			case 1: SetAlgorithm(instPtr); continue;
+			case 2: SetPalette(instPtr); continue;
+			case 3: SetZoom(instPtr); continue;
+			case 4: RenderImage(instPtr); continue;
 
 			default: continue;
 
-		}
+			}
 
+		}
 	}
+
+	CleanUp(&instPtr);
 }
