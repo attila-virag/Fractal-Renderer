@@ -1,5 +1,7 @@
 #pragma once
+#include "Exports.h"
 #include <vector>
+#include <string>
 
 
 class BitmapWriter {
@@ -13,6 +15,7 @@ private:
 	int m_height{ 0 };
 	int m_width{ 0 };
 
+	std::string imageDirectory = workingDirectory + "images\\";
 
 	void GetTestData();
 

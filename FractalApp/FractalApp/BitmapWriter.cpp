@@ -82,7 +82,9 @@ bool BitmapWriter::WriteBitmap(const char* filename)
 
 	errno_t err;
 
-	if ((err = fopen_s(&outfile, filename, "wb")) != 0) {
+	std::string imagePath = imageDirectory + std::string(filename) + ".bmp";
+
+	if ((err = fopen_s(&outfile, imagePath.c_str(), "wb")) != 0) {
 
 		return false;
 	}

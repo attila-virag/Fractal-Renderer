@@ -1,7 +1,5 @@
 #pragma once
 
-// Test Functions - just to exersize code
-
 #include "ColorPalette.h"
 #include "Zoom.h"
 #include "FractalAlgorithm.h"

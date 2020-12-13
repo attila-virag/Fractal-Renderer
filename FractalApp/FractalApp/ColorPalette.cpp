@@ -18,52 +18,52 @@ void ColorPalette::LinearInterpolate(double magnitude, int & rValue, int & gValu
 
 	double xa = 0;
 	double xb = .1;
-	double slope;
+	double slope = 0;
 
-	double redValue, greenValue, blueValue;
+	double redValue, greenValue, blueValue = 0;
 
 	if (magnitude < 0.1) {
 		slope = (magnitude - xa) / (xb - xa);
 
-		redValue = Rvalues[0] + (Rvalues[1] - Rvalues[0])*slope;
-		greenValue = Gvalues[0] + (Gvalues[1] - Gvalues[0])*slope;
-		blueValue = Bvalues[0] + (Bvalues[1] - Bvalues[0])*slope;
+		redValue = Rvalues[0] + ((double)Rvalues[1] - (double)Rvalues[0])*slope;
+		greenValue = Gvalues[0] + ((double)Gvalues[1] - (double)Gvalues[0])*slope;
+		blueValue = Bvalues[0] + ((double)Bvalues[1] - (double)Bvalues[0])*slope;
 	}
 	else if (magnitude < 0.2) {
 		xa = 0.1;
 		xb = 0.2;
 		slope = (magnitude - xa) / (xb - xa);
 
-		redValue = Rvalues[1] + (Rvalues[2] - Rvalues[1])*slope;
-		greenValue = Gvalues[1] + (Gvalues[2] - Gvalues[1])*slope;
-		blueValue = Bvalues[1] + (Bvalues[2] - Bvalues[1])*slope;
+		redValue = Rvalues[1] + ((double)Rvalues[2] - (double)Rvalues[1])*slope;
+		greenValue = Gvalues[1] + ((double)Gvalues[2] - (double)Gvalues[1])*slope;
+		blueValue = Bvalues[1] + ((double)Bvalues[2] - (double)Bvalues[1])*slope;
 	}
 	else if (magnitude < 0.3) {
 		xa = 0.2;
 		xb = 0.3;
 		slope = (magnitude - xa) / (xb - xa);
 
-		redValue = Rvalues[2] + (Rvalues[3] - Rvalues[2])*slope;
-		greenValue = Gvalues[2] + (Gvalues[3] - Gvalues[2])*slope;
-		blueValue = Bvalues[2] + (Bvalues[3] - Bvalues[2])*slope;
+		redValue = Rvalues[2] + ((double)Rvalues[3] - (double)Rvalues[2])*slope;
+		greenValue = Gvalues[2] + ((double)Gvalues[3] - (double)Gvalues[2])*slope;
+		blueValue = Bvalues[2] + ((double)Bvalues[3] - (double)Bvalues[2])*slope;
 	}
 	else if (magnitude < 0.4) {
 		xa = 0.3;
 		xb = 0.4;
 		slope = (magnitude - xa) / (xb - xa);
 
-		redValue = Rvalues[3] + (Rvalues[4] - Rvalues[3])*slope;
-		greenValue = Gvalues[3] + (Gvalues[4] - Gvalues[3])*slope;
-		blueValue = Bvalues[3] + (Bvalues[4] - Bvalues[3])*slope;
+		redValue = Rvalues[3] + ((double)Rvalues[4] - (double)Rvalues[3])*slope;
+		greenValue = Gvalues[3] + ((double)Gvalues[4] - (double)Gvalues[3])*slope;
+		blueValue = Bvalues[3] + ((double)Bvalues[4] - (double)Bvalues[3])*slope;
 	}
-	else if (magnitude <= 0.5) {
+	else {
 		xa = 0.4;
 		xb = 0.5;
 		slope = (magnitude - xa) / (xb - xa);
 
-		redValue = Rvalues[4] + (Rvalues[0] - Rvalues[4])*slope;
-		greenValue = Gvalues[4] + (Gvalues[0] - Gvalues[4])*slope;
-		blueValue = Bvalues[4] + (Bvalues[0] - Bvalues[4])*slope;
+		redValue = Rvalues[4] + ((double)Rvalues[0] - (double)Rvalues[4])*slope;
+		greenValue = Gvalues[4] + ((double)Gvalues[0] - (double)Gvalues[4])*slope;
+		blueValue = Bvalues[4] + ((double)Bvalues[0] - (double)Bvalues[4])*slope;
 	}
 
 	rValue = static_cast<int>(redValue);
@@ -89,13 +89,13 @@ void ColorPalette::EnterPalette(vector<int> red, vector<int> green, vector<int> 
 	}
 }
 
-void ColorPalette::SavePaletteToFile(std::string fileName)
+bool ColorPalette::SavePaletteToFile(std::string fileName)
 {
 	std::ofstream outFile;
 
-	fileName = fileName + ".txt";
+	std::string filePath = paletteDir+fileName + ".txt";
 
-	outFile.open(fileName);
+	outFile.open(filePath);
 
 	if (outFile.is_open()) {
 
@@ -123,14 +123,18 @@ void ColorPalette::SavePaletteToFile(std::string fileName)
 	else
 	{
 		cout << "Could not open file" << std::endl;
+		return false;
 	}
+	return true;
 }
 
 bool ColorPalette::LoadPaletteFromFile(std::string fileName)
 {
 	std::ifstream inFile;
 
-	inFile.open(fileName);
+	std::string filePath = paletteDir + fileName + ".txt";
+
+	inFile.open(filePath);
 
 	std::string line;
 

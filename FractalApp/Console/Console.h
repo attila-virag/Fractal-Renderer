@@ -88,24 +88,69 @@ void SetPalette(void * proc) {
 	}
 
 }
-void SetZoom(void * proc) {
+
+void LoadLocation(void* proc)
+{
+	std::string name;
+	cout << "Please enter a file name without extension. " << std::endl;
+	cin >> name;
+
+	LoadLocationFromFile(proc, name.c_str());
+}
+
+void SaveLocation(void* proc)
+{
+	std::string name;
+	cout << "Please enter a file name without extension. " << std::endl;
+	cin >> name;
+
+	SaveLocationToFile(proc, name.c_str());
+}
+
+void SetZoom(void* proc) {
 	double x_center, y_center, zoom;
 	int pixels;
 
 	// has to be fixed to take each value separately
 
-	//cout << "Please enter x - coordinate: " << std::endl;
-	//cin >> x_center;
-	//cout << "Please enter y - coordinate: " << std::endl;
-	//cin >> y_center;
-	//cout << "Please enter zoom scale: " << std::endl;
-	//cin >> zoom;
-	//cout << "Please enter pixels (larger than 2000 will take long to generate): " << std::endl;
-	//cin >> pixels;
+	cout << "Please enter x - coordinate: " << std::endl;
+	cin >> x_center;
+	cout << "Please enter y - coordinate: " << std::endl;
+	cin >> y_center;
+	cout << "Please enter zoom scale: " << std::endl;
+	cin >> zoom;
+	cout << "Please enter pixels (larger than 2000 will take long to generate): " << std::endl;
+	cin >> pixels;
 
-	//proc->m_algo->m_zoom->ResetZoom(x_center, y_center, zoom, pixels);
+	Set_X_Value(proc, x_center);
+
+	Set_Y_Value(proc, y_center);
+
+	Set_Zoom(proc, zoom);
+
+	Set_Pixels(proc, pixels);
 
 }
+
+
+
+void SetLocation(void * proc)
+{
+	int option = 1;
+
+	cout << "Please enter a location setting option: " << std::endl;
+	cout << "1 = Load From File , 2 = Enter Location, 3 = Save Current Location Info " << std::endl;
+	cin >> option;
+
+	switch (option) {
+		case 1: LoadLocation(proc); break;
+		case 2: SetZoom(proc); break;
+		case 3: SaveLocation(proc); break;
+		default:;
+	}
+} 
+
+
 void RenderImage(void * proc) {
 
 	std::string name = "";
@@ -125,23 +170,17 @@ void RenderImage(void * proc) {
 		cin >> preview;
 
 		if (preview == 1) {
-			//auto pixels = proc->m_algo->m_zoom->pixels;
-
-			//proc->m_algo->m_zoom->pixels = 500;
-
-			//proc->CreatePicture(name + "_preview");
-
-			//proc->m_algo->m_zoom->pixels = pixels;
+			GeneratePreview(proc, name.c_str());
 		}
 
 		cout << "Enter 1 to generate full image, enter 2 to change coordinates: " << std::endl;
 		cin >> done;
 
 		if (done == 1) {
-			//proc->CreatePicture(name);
+			GenerateImage(proc, name.c_str());
 		}
 		else if (done == 2) {
-			//SetZoom(proc);
+			SetLocation(proc);
 		}
 
 		cout << "Enter 0 to continue or enter 1 to return to main menu" << std::endl;
@@ -172,7 +211,7 @@ void Console() {
 			case 10: break;
 			case 1: SetAlgorithm(instPtr); continue;
 			case 2: SetPalette(instPtr); continue;
-			case 3: SetZoom(instPtr); continue;
+			case 3: SetLocation(instPtr); continue;
 			case 4: RenderImage(instPtr); continue;
 
 			default: continue;

@@ -1,4 +1,5 @@
 #pragma once
+#include "Exports.h"
 #include <array>
 #include <vector>
 #include <random>
@@ -12,14 +13,15 @@
 using std::array;
 using std::vector;
 
-class ColorPalette {
-
+class DLL_EXPORT ColorPalette {
+private:
 	array<int, 5> Rvalues;
 	array<int, 5> Gvalues;
 	array<int, 5> Bvalues;
 
 	std::random_device rd;
 
+	const std::string paletteDir = workingDirectory + "palettes\\";
 
 	void SetDefaultPalette() {
 
@@ -53,7 +55,7 @@ public:
 	ColorPalette() {
 		SetDefaultPalette();
 	}
-	ColorPalette(ColorPalette &orig){}
+	//ColorPalette(ColorPalette &orig){}
 
 	void EnterPalette(vector<int> red, vector<int> green, vector<int> blue);
 
@@ -61,7 +63,7 @@ public:
 		LinearInterpolate(magnitude, redValue, greenValue, blueValue);
 	}
 
-	void SavePaletteToFile(std::string fileName);
+	bool SavePaletteToFile(std::string fileName);
 
 	bool LoadPaletteFromFile(std::string fileName);
 

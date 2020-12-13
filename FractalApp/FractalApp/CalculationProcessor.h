@@ -17,7 +17,7 @@ using std::vector;
 using std::unique_ptr;
 using std::mutex;
 
-class CalculationProcessor {
+class DLL_EXPORT CalculationProcessor {
 private:
 
 	vector<vector<int>> m_redData;
@@ -59,7 +59,7 @@ private:
 public:
 
 	FractalFunction m_func = nullptr;
-	unique_ptr<FractalAlgorithm> m_algo = nullptr;
+	FractalAlgorithm* m_algo = nullptr;
 
 	CalculationProcessor(FractalAlgorithm* algo,  int threads = 0);
 

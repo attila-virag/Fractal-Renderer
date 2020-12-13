@@ -4,9 +4,13 @@
 #include "BitmapWriter.h"
 
 #include <thread>
+#include <functional>
 
 using std::thread;
 
+//#define SINGLE_THREAD
+
+// grabs a point to be calculated
 unique_ptr<Result> CalculationProcessor::GetNextPoint()
 {
 	std::lock_guard<mutex> locker(_mu1);
@@ -16,7 +20,7 @@ unique_ptr<Result> CalculationProcessor::GetNextPoint()
 	unique_ptr<Result> p = std::move(pointQueue.front());
 	pointQueue.pop();
 
-	return p;
+	return std::move(p);
 }
 
 unique_ptr<Result> CalculationProcessor::GetNextResult()
@@ -28,9 +32,10 @@ unique_ptr<Result> CalculationProcessor::GetNextResult()
 	unique_ptr<Result> p = std::move(resultQueue.front());
 	resultQueue.pop();
 
-	return p;
+	return std::move(p);
 }
 
+// for each pixel that we are interested in
 void CalculationProcessor::AddPointToQueue(int x, int y)
 {
 	std::lock_guard<mutex> locker(_mu1);
@@ -46,15 +51,19 @@ bool CalculationProcessor::IsQueueEmpty()
 	return pointQueue.empty();
 }
 
+// the result queue can be processed as soon as there 
 bool CalculationProcessor::IsResultQueueEmpty() {
 	std::lock_guard<mutex> locker(_mu2);
 	return resultQueue.empty();
 }
 
+// Running one per thread
 void CalculationProcessor::CalculatePoint(int threadId)
 {
+	// while there are points to be processed
 	while (!IsQueueEmpty()) {
 
+		// get the next available point to calculate
 		auto p = GetNextPoint();
 		if (p == nullptr) break;
 
@@ -75,7 +84,9 @@ void CalculationProcessor::ProcessResult() {
 		auto p = GetNextResult();
 		if (p == nullptr) break;
 		
-		m_algo->GetNormalization(p.get());
+		if (m_algo->algoType != AlgorithmType::ShowColorPalette) {
+			m_algo->GetNormalization(p.get());
+		}
 
 		int red = 0;
 		int green = 0;
@@ -87,8 +98,6 @@ void CalculationProcessor::ProcessResult() {
 		m_redData[p->x_coordinate][p->y_coordinate] = red;
 		m_greenData[p->x_coordinate][p->y_coordinate] = green;
 		m_blueData[p->x_coordinate][p->y_coordinate] = blue;
-
-		p.reset(nullptr);
 
 	}
 }
@@ -119,8 +128,6 @@ void CalculationProcessor::PreparePoints()
 
 void CalculationProcessor::WriteImage(std::string fileName)
 {
-	fileName = "images\\"+fileName + ".bmp";
-
 	// order red, blue, green
 	BitmapWriter bp(m_redData, m_blueData, m_greenData, m_algo->m_zoom->pixels, m_algo->m_zoom->pixels);
 
@@ -134,6 +141,9 @@ CalculationProcessor::CalculationProcessor(FractalAlgorithm* algo, int threads):
 
 	// try to pull ideal concurency level of machine
 	// assume cpu bound process
+#ifdef SINGLE_THREAD
+	m_concurrency = 1;
+#else
 	auto concurrency = std::thread::hardware_concurrency();
 	if (concurrency > 0 && threads == 0) {
 		m_concurrency = concurrency;
@@ -141,7 +151,7 @@ CalculationProcessor::CalculationProcessor(FractalAlgorithm* algo, int threads):
 	else {
 		m_concurrency = threads;
 	}
-
+#endif
 	m_redData.clear();
 	m_blueData.clear();
 	m_greenData.clear();
@@ -163,11 +173,13 @@ void CalculationProcessor::CreatePicture(std::string fileName)
 
 	vector<thread> threadList;
 
+	// does all calculations and then all image generation, could be optimized
+
 	for (unsigned int t = 0; t < m_concurrency; t++) {
 		threadList.push_back(thread(&CalculationProcessor::CalculatePoint, this, t));
 	}
 
-	for_each(threadList.begin(), threadList.end(), mem_fn(&std::thread::join));
+	for_each(threadList.begin(), threadList.end(), std::mem_fn(&std::thread::join));
 
 	//generatorThread.join();
 	vector<thread> threadList2; // TODO see about reusing the original thread vector
@@ -176,7 +188,7 @@ void CalculationProcessor::CreatePicture(std::string fileName)
 		threadList2.push_back(thread(&CalculationProcessor::ProcessResult, this));
 	}
 
-	for_each(threadList2.begin(), threadList2.end(), mem_fn(&std::thread::join));
+	for_each(threadList2.begin(), threadList2.end(), std::mem_fn(&std::thread::join));
 
 
 	WriteImage(fileName);

@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FractalApp", "FractalApp\FractalApp.vcxproj", "{BFF96B9C-2114-401E-A16D-794EBA64C086}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\UnitTests.vcxproj", "{1320D57D-C36A-41CF-9865-C3EC23228BE6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Console", "Console\Console.vcxproj", "{1CBE2B56-253E-4AF7-AE4A-9E68A25A746E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,22 @@ Global
 		{BFF96B9C-2114-401E-A16D-794EBA64C086}.Release|x64.Build.0 = Release|x64
 		{BFF96B9C-2114-401E-A16D-794EBA64C086}.Release|x86.ActiveCfg = Release|Win32
 		{BFF96B9C-2114-401E-A16D-794EBA64C086}.Release|x86.Build.0 = Release|Win32
+		{1320D57D-C36A-41CF-9865-C3EC23228BE6}.Debug|x64.ActiveCfg = Debug|x64
+		{1320D57D-C36A-41CF-9865-C3EC23228BE6}.Debug|x64.Build.0 = Debug|x64
+		{1320D57D-C36A-41CF-9865-C3EC23228BE6}.Debug|x86.ActiveCfg = Debug|Win32
+		{1320D57D-C36A-41CF-9865-C3EC23228BE6}.Debug|x86.Build.0 = Debug|Win32
+		{1320D57D-C36A-41CF-9865-C3EC23228BE6}.Release|x64.ActiveCfg = Release|x64
+		{1320D57D-C36A-41CF-9865-C3EC23228BE6}.Release|x64.Build.0 = Release|x64
+		{1320D57D-C36A-41CF-9865-C3EC23228BE6}.Release|x86.ActiveCfg = Release|Win32
+		{1320D57D-C36A-41CF-9865-C3EC23228BE6}.Release|x86.Build.0 = Release|Win32
+		{1CBE2B56-253E-4AF7-AE4A-9E68A25A746E}.Debug|x64.ActiveCfg = Debug|x64
+		{1CBE2B56-253E-4AF7-AE4A-9E68A25A746E}.Debug|x64.Build.0 = Debug|x64
+		{1CBE2B56-253E-4AF7-AE4A-9E68A25A746E}.Debug|x86.ActiveCfg = Debug|Win32
+		{1CBE2B56-253E-4AF7-AE4A-9E68A25A746E}.Debug|x86.Build.0 = Debug|Win32
+		{1CBE2B56-253E-4AF7-AE4A-9E68A25A746E}.Release|x64.ActiveCfg = Release|x64
+		{1CBE2B56-253E-4AF7-AE4A-9E68A25A746E}.Release|x64.Build.0 = Release|x64
+		{1CBE2B56-253E-4AF7-AE4A-9E68A25A746E}.Release|x86.ActiveCfg = Release|Win32
+		{1CBE2B56-253E-4AF7-AE4A-9E68A25A746E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
