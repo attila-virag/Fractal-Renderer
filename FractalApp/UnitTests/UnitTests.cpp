@@ -81,6 +81,53 @@ namespace UnitTests
 			Assert::AreEqual((double)1, zoom.zoom);
 		}
 
+		TEST_METHOD(TestSerializeResult)
+		{
+			int x = 222;
+			int y = 345;
+
+			int iter = 100;
+			double mag = 300;
+			double angle = 200;
+
+			Result r;
+
+			r.escaped = true;
+			r.x_pixel = x;
+			r.y_pixel = y;
+
+			r.finalAngle = angle;
+			r.finalMagnitude = mag;
+
+			std::ofstream outFile;
+
+			std::string filePath = workingDirectory + "results\\" + "serializeTest" + ".txt";
+
+			outFile.open(filePath);
+
+			if (outFile.is_open()) {
+
+				outFile << "X: " << std::endl;
+
+				r.Serialize(outFile);
+
+			}
+
+			Result r2;
+
+			outFile.close();
+
+			std::ifstream inFile;
+
+			inFile.open(filePath);
+
+			if (inFile.is_open()) {
+				r2.Deserialize(inFile);
+			}
+
+			Assert::IsTrue(r.AreEqual(r2));
+		}
+
 		TEST_METHOD(TestMandelbrot)
 		{
 

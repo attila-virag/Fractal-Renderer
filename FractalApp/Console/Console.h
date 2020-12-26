@@ -111,25 +111,76 @@ void SetZoom(void* proc) {
 	double x_center, y_center, zoom;
 	int pixels;
 
-	// has to be fixed to take each value separately
+	int option = 1;
+	while (option != 10) {
 
-	cout << "Please enter x - coordinate: " << std::endl;
-	cin >> x_center;
-	cout << "Please enter y - coordinate: " << std::endl;
-	cin >> y_center;
-	cout << "Please enter zoom scale: " << std::endl;
-	cin >> zoom;
-	cout << "Please enter pixels (larger than 2000 will take long to generate): " << std::endl;
-	cin >> pixels;
+		x_center = Get_X_Value(proc);
+		y_center = Get_Y_Value(proc);
+		zoom = Get_Zoom(proc);
+		pixels = Get_Pixels(proc);
 
-	Set_X_Value(proc, x_center);
+		cout << "Current coordinates: x: " << x_center << ", y: " << y_center << ", zoom scale: " << zoom << ", pixels: " << pixels << std::endl;
+		cout << "Please enter a color palette option: " << std::endl;
+		cout << "1 = Change x, 2 = Change y, 3 = Change zoom scale, 4 = Change pixels, 5 = Move Left 10%, 6 = Move Right 10%, 7 = Move Down 10%, 8 = Move Up 10%, 10 = exit" << std::endl;
+		cin >> option;
 
-	Set_Y_Value(proc, y_center);
+		switch (option) {
 
-	Set_Zoom(proc, zoom);
-
-	Set_Pixels(proc, pixels);
-
+		case 1:
+		{
+			cout << "Please enter x - coordinate: " << std::endl;
+			cin >> x_center;
+			Set_X_Value(proc, x_center);
+			break;
+		}
+		case 2:
+		{
+			cout << "Please enter y - coordinate: " << std::endl;
+			cin >> y_center;
+			Set_Y_Value(proc, y_center);
+			break;
+		}
+		case 3:
+		{
+			cout << "Please enter zoom scale: " << std::endl;
+			cin >> zoom;
+			Set_Zoom(proc, zoom);
+			break;
+		}
+		case 4:
+		{
+			cout << "Please enter pixels: " << std::endl;
+			cin >> pixels;
+			Set_Pixels(proc, pixels);
+			break;
+		}
+		case 5:
+		{
+			Set_X_Value(proc, x_center - (Get_Zoom(proc) * 0.1));
+			break;
+		}
+		case 6:
+		{
+			Set_X_Value(proc, x_center + (Get_Zoom(proc) * 0.1));
+			break;
+		}
+		case 7:
+		{
+			Set_Y_Value(proc, y_center - (Get_Zoom(proc) * 0.1));
+			break;
+		}
+		case 8:
+		{
+			Set_Y_Value(proc, y_center + (Get_Zoom(proc) * 0.1));
+			break;
+		}
+		default:
+		{
+			Reset_Zoom(proc);
+			break;
+		}
+		}
+	}
 }
 
 
@@ -164,6 +215,37 @@ void RenderImage(void * proc) {
 	int done = 0;
 
 	while (done == 0) {
+
+		int option = 1;
+
+		cout << "Please enter a generation option: " << std::endl;
+		cout << "1 = Generate 500x500 Preview , 2 = Write Results to File, 3 = Generate image from File, 4 = Generate full image " << std::endl;
+		cin >> option;
+
+		switch (option) {
+		case 1: 
+		{
+			GeneratePreview(proc, name.c_str());
+			break;
+		}
+		case 2: 
+		{
+
+			// save all iteration data to a file
+			break;
+		}
+		case 3:
+		{
+			// load iteration data from file and generate image
+			break;
+		}
+		case 4:
+		{
+			// generates and and image in one
+			break;
+		}
+		default:;
+		}
 
 		int preview = 0;
 		cout << "Enter 1 to generate 500X500 preview : " << std::endl;
@@ -202,24 +284,24 @@ void Console() {
 			int option = 0;
 
 			cout << "Please enter an option: " << std::endl;
-			cout << "1 = Set algorithm , 2 = Set Palette, 3 = Set Zoom, 4 = Render Image, 10 = exit" << std::endl;
+			cout << "1 = Set algorithm , 2 = Set Palette, 3 = Set Zoom, 4 = Render Image, 10 = save and exit" << std::endl;
 			cout << "=>";
 			cin >> option;
 
 			switch (option) {
 
-			case 10: break;
 			case 1: SetAlgorithm(instPtr); continue;
 			case 2: SetPalette(instPtr); continue;
 			case 3: SetLocation(instPtr); continue;
 			case 4: RenderImage(instPtr); continue;
 
+			case 10: {
+				CleanUp(&instPtr);
+				break;
+			}
 			default: continue;
-
 			}
 
 		}
 	}
-
-	CleanUp(&instPtr);
 }

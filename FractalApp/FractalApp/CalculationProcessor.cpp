@@ -40,8 +40,8 @@ void CalculationProcessor::AddPointToQueue(int x, int y)
 {
 	std::lock_guard<mutex> locker(_mu1);
 	unique_ptr<Result> p(new Result());
-	p->x_coordinate = x;
-	p->y_coordinate = y;
+	p->x_pixel = x;
+	p->y_pixel = y;
 	pointQueue.push(std::move(p));
 }
 
@@ -77,6 +77,23 @@ void CalculationProcessor::CalculatePoint(int threadId)
 	}
 }
 
+void CalculationProcessor::SerializeResult(std::string fileName)
+{
+	std::ofstream outFile;
+
+	std::string filePath = workingDirectory + "results\\" + fileName + ".txt";
+
+	outFile.open(filePath);
+
+	if (outFile.is_open()) {
+		//this->
+		//r.Serialize(outFile);
+
+	}
+
+	outFile.close();
+}
+
 void CalculationProcessor::ProcessResult() {
 
 	while (!IsResultQueueEmpty()) {
@@ -93,11 +110,11 @@ void CalculationProcessor::ProcessResult() {
 		int blue = 0;
 
 		if (p->escaped || m_algo->algoType == AlgorithmType::ShowColorPalette) {
-			m_algo->m_color->GetColor(p->magnitude, red, green, blue);
+			m_algo->m_color->GetColor(p->finalMagnitude, red, green, blue);
 		}
-		m_redData[p->x_coordinate][p->y_coordinate] = red;
-		m_greenData[p->x_coordinate][p->y_coordinate] = green;
-		m_blueData[p->x_coordinate][p->y_coordinate] = blue;
+		m_redData[p->x_pixel][p->y_pixel] = red;
+		m_greenData[p->x_pixel][p->y_pixel ] = green;
+		m_blueData[p->x_pixel][p->y_pixel] = blue;
 
 	}
 }

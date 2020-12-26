@@ -14,6 +14,10 @@ extern "C" {
 		auto pAlgo = new FractalAlgorithm(pZoom, pColor);
 		auto pProc = new  CalculationProcessor(pAlgo);
 
+		// load the deafault files
+		pZoom->LoadZoomDataFromFile("default");
+		pColor->LoadPaletteFromFile("default");
+
 		*instPtr = (void*)pProc;
 
 		if (*instPtr == nullptr)
@@ -26,6 +30,10 @@ extern "C" {
 		if (instPtr != nullptr) {
 
 			auto pProc = (CalculationProcessor*)instPtr;
+
+			// lets save the palletes and coordinates as defaults
+			pProc->m_algo->m_zoom->SaveZoomDataToFile("default");
+			pProc->m_algo->m_color->SavePaletteToFile("default");
 
 			delete pProc;
 
@@ -95,6 +103,10 @@ extern "C" {
 		else return false;
 	}
 
+	int Get_Pixels(void* instPtr)
+	{
+			return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->pixels;
+	}
 
 	bool Set_X_Value(void* instPtr, double x_value)
 	{
@@ -105,6 +117,11 @@ extern "C" {
 			return true;
 		}
 		else return false;
+	}
+
+	double Get_X_Value(void* instPtr)
+	{
+			return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->x_center;
 	}
 
 	bool Set_Y_Value(void* instPtr, double y_value)
@@ -118,6 +135,11 @@ extern "C" {
 		else return false;
 	}
 
+	double Get_Y_Value(void* instPtr)
+	{
+			return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->y_center;
+	}
+
 	bool Set_Zoom(void* instPtr, double zoom)
 	{
 		if (instPtr != nullptr) {
@@ -127,6 +149,16 @@ extern "C" {
 			return true;
 		}
 		return false;
+	}
+
+	double Get_Zoom(void* instPtr)
+	{
+			return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->zoom;
+	}
+
+	void DLL_EXPORT Reset_Zoom(void* instPtr)
+	{
+		((CalculationProcessor*)instPtr)->m_algo->m_zoom->ResetZoom();
 	}
 
 	bool LoadLocationFromFile(void* instPtr, const char* filename)
@@ -201,9 +233,13 @@ extern "C" {
 
 		proc->m_algo->m_zoom->pixels = 500;
 
+		proc->m_algo->m_zoom->ResetZoom();
+
 		proc->CreatePicture(std::string(filename) + "_preview");
 
 		proc->m_algo->m_zoom->pixels = pixels;
+
+		proc->m_algo->m_zoom->ResetZoom();
 
 		return true;
 	}

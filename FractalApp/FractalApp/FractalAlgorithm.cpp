@@ -8,7 +8,7 @@ using std::complex;
 // this will simply range the magnitude 0 -> 1 -> 0 going left to right
 void FractalAlgorithm::ShowColorPalette(Result * pt)
 {
-	pt->magnitude = pt->x_coordinate / (double)m_zoom->pixels;
+	pt->finalMagnitude = pt->x_pixel / (double)m_zoom->pixels;
 }
 
 // optimization to check if point is within cardioid or bulb
@@ -61,8 +61,8 @@ void FractalAlgorithm::MandelBrotSet(Result * pt)
 {
 	int iterationCountLimit = m_zoom->recommendedIterations;
 
-	double x_point = m_zoom->x_min + pt->x_coordinate*m_zoom->x_increment;
-	double y_point = m_zoom->y_min + pt->y_coordinate*m_zoom->y_increment;
+	double x_point = m_zoom->x_min + pt->x_pixel*m_zoom->x_increment;
+	double y_point = m_zoom->y_min + pt->y_pixel*m_zoom->y_increment;
 
 	int iteration = 0;
 	double normalizedIteration = 0;
@@ -90,7 +90,7 @@ void FractalAlgorithm::MandelBrotSet(Result * pt)
 
 	switch(colorScheme) {
 		case ColorScheme::EscapeAngle:
-			pt->magnitude = escapeAngle;
+			pt->finalMagnitude = escapeAngle;
 			break;
 		case ColorScheme::IterationCount :
 		{
@@ -100,11 +100,11 @@ void FractalAlgorithm::MandelBrotSet(Result * pt)
 			if (iterationsMax < iteration) {
 				iterationsMax = iteration;
 			}
-			pt->magnitude = iteration;
+			pt->finalMagnitude = iteration;
 			break;
 		}
 		case ColorScheme::FinalMagnitude:
-			pt->magnitude = magnitude;
+			pt->finalMagnitude = magnitude;
 	}
 
 	
@@ -135,15 +135,15 @@ void FractalAlgorithm::GetNormalization(Result* pt) {
 
 	if (colorScheme == ColorScheme::FinalMagnitude)
 	{
-		pt->magnitude = sqrt(sqrt(pt->magnitude / topMagnitude));
+		pt->finalMagnitude = sqrt(sqrt(pt->finalMagnitude / topMagnitude));
 	}
 	else if (colorScheme == ColorScheme::IterationCount)
 	{
-		pt->magnitude = (pt->magnitude - iterationsMin) / (iterationsMax - (double)iterationsMin);
+		pt->finalMagnitude = (pt->finalMagnitude - iterationsMin) / (iterationsMax - (double)iterationsMin);
 
 		// amplify some ranges as needed
 		// some square roots can push smaller values higher while still keeping the max at boundary 1
-		pt->magnitude = sqrt(sqrt(sqrt(pt->magnitude)));
+		pt->finalMagnitude = sqrt(sqrt(sqrt(pt->finalMagnitude)));
 	}
 
 }

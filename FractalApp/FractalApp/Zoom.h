@@ -51,6 +51,11 @@ public:
 		y_increment = (y_max - y_min) / (double)pixels;
 	}
 
+	void ResetZoom()
+	{
+		ResetZoom(x_center, y_center, zoom, pixels);
+	}
+
 	// call this whenever any of the parameters change
 	void ResetZoom(double xCenter, double yCenter, double zoom, int pls) {
 
@@ -98,8 +103,49 @@ public:
 		double xCenter = 0;
 		double yCenter = 0;
 		double zoom = 0;
+		int pixels = 0;
 
 		if (inFile.is_open()) {
+
+			Deserialize(inFile);
+		}
+		else return false;
+	}
+
+	bool Serialize(std::ofstream& outFile)
+	{
+		if (outFile.is_open())
+		{
+			outFile << "X Center: " << std::endl;
+
+			outFile << x_center << std::endl;
+
+			outFile << "Y Center: " << std::endl;
+
+			outFile << y_center << std::endl;
+
+			outFile << "Zoom: " << std::endl;
+
+			outFile << zoom << std::endl;
+
+			outFile << "Pixels: " << std::endl;
+
+			outFile << pixels << std::endl;
+			return true;
+		}
+		return false;
+	}
+
+	bool Deserialize(std::ifstream& inFile)
+	{
+		if (inFile.is_open()) {
+
+			std::string line;
+
+			double xCenter = 0;
+			double yCenter = 0;
+			double zoom = 0;
+			int pixels = 0;
 
 			getline(inFile, line);
 
@@ -115,6 +161,11 @@ public:
 
 			inFile >> zoom;
 
+			getline(inFile, line);
+			getline(inFile, line);
+
+			inFile >> pixels;
+
 			inFile.close();
 
 			ResetZoom(xCenter, yCenter, zoom, pixels);
@@ -123,7 +174,6 @@ public:
 		}
 		else return false;
 	}
-
 
 	bool SaveZoomDataToFile(std::string fileName)
 	{
@@ -135,17 +185,7 @@ public:
 
 		if (outFile.is_open()) {
 
-			outFile << "X Center: " << std::endl;
-
-			outFile << x_center << std::endl;
-
-			outFile << "Y Center: " << std::endl;
-
-			outFile << y_center << std::endl;
-
-			outFile << "Zoom: " << std::endl;
-
-			outFile << zoom << std::endl;
+			Serialize(outFile);
 
 			outFile.close();
 		}

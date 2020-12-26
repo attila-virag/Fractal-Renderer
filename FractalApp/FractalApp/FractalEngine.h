@@ -19,11 +19,21 @@ extern "C" {
 
 	bool DLL_EXPORT Set_Pixels(void *instPtr, int pixels);
 
+	int DLL_EXPORT Get_Pixels(void* instPtr);
+
 	bool DLL_EXPORT Set_X_Value(void *instPtr, double x_value);
+
+	double DLL_EXPORT Get_X_Value(void* instPtr);
 
 	bool DLL_EXPORT Set_Y_Value(void *instPtr, double y_value);
 
+	double DLL_EXPORT Get_Y_Value(void* instPtr);
+
 	bool DLL_EXPORT Set_Zoom(void* instPtr, double zoom);
+
+	double DLL_EXPORT Get_Zoom(void* instPtr);
+
+	void DLL_EXPORT Reset_Zoom(void* instPtr);
 
 	bool DLL_EXPORT LoadLocationFromFile(void* instPtr, const char* filename);
 

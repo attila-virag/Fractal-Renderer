@@ -3,13 +3,90 @@
 #include "ColorPalette.h"
 #include <complex>
 #include <memory>
+#include <iostream>
 #include <unordered_map>
 
 struct Result {
-	int x_coordinate;
-	int y_coordinate;
 
-	double magnitude; // could mean differnet things depending on the algorithm but should be between 0-1 before passed into the palette
+	int version = 1;
+
+	// coordinates are pixels
+	int x_pixel = 0;
+	int y_pixel = 0;
+
+	int finalIteration = 0;
+
+	double finalAngle = 0;
+
+	double finalMagnitude = 0;
+
+	bool AreEqual(const Result& other)
+	{
+		return (this->version == other.version && this->x_pixel == other.x_pixel && this->y_pixel == other.y_pixel && this->finalIteration == other.finalIteration &&
+			this->finalAngle == other.finalAngle && this->finalMagnitude == other.finalMagnitude);
+	}
+
+	void Serialize(std::ofstream& outFile)
+	{
+		outFile << "X: " << std::endl;
+
+		outFile << x_pixel << std::endl;
+
+		outFile << "Y: " << std::endl;
+
+		outFile << y_pixel << std::endl;
+
+		outFile << "finalIteration: " << std::endl;
+
+		outFile << finalIteration << std::endl;
+
+		outFile << "finalAngle: " << std::endl;
+
+		outFile << finalAngle << std::endl;
+		
+		outFile << "finalMagnitude: " << std::endl;
+
+		outFile << finalMagnitude << std::endl;
+
+		outFile << "escaped: " << std::endl;
+
+		outFile << escaped << std::endl;
+
+	}
+
+	void Deserialize(std::ifstream& inFile)
+	{
+		std::string line;
+		std::getline(inFile, line);
+
+		inFile >> x_pixel;
+
+		std::getline(inFile, line);
+		std::getline(inFile, line);
+
+		inFile >> y_pixel;
+
+		std::getline(inFile, line);
+		std::getline(inFile, line);
+
+		inFile >> finalIteration;
+
+		std::getline(inFile, line);
+		std::getline(inFile, line);
+
+		inFile >> finalAngle;
+
+		std::getline(inFile, line);
+		std::getline(inFile, line);
+
+		inFile >> finalMagnitude;
+
+		std::getline(inFile, line);
+		std::getline(inFile, line);
+
+		inFile >> escaped;
+
+	}
 
 	bool escaped;
 };

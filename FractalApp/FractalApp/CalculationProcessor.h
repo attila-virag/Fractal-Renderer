@@ -53,6 +53,8 @@ private:
 
 	void PreparePoints();
 
+	void SerializeResult(std::string fileName);
+
 	// single thread
 	void WriteImage(std::string fileName);
 
@@ -64,6 +66,8 @@ public:
 	CalculationProcessor(FractalAlgorithm* algo,  int threads = 0);
 
 	~CalculationProcessor();
+
+	bool LoadResultFromFile(std::string filename);
 
 	void CreatePicture(std::string fileName);
 
