@@ -13,7 +13,7 @@
 using std::array;
 using std::vector;
 
-class DLL_EXPORT ColorPalette {
+class  ColorPalette {
 private:
 	array<int, 5> Rvalues;
 	array<int, 5> Gvalues;
@@ -52,21 +52,21 @@ private:
 
 public:
 
-	ColorPalette() {
+	DLL_EXPORT ColorPalette() {
 		SetDefaultPalette();
 	}
 	//ColorPalette(ColorPalette &orig){}
 
-	void EnterPalette(vector<int> red, vector<int> green, vector<int> blue);
+	void DLL_EXPORT EnterPalette(vector<int> red, vector<int> green, vector<int> blue);
 
-	void GetColor(double magnitude, int &redValue, int &greenValue, int &blueValue) {
+	void DLL_EXPORT GetColor(double magnitude, int &redValue, int &greenValue, int &blueValue) {
 		LinearInterpolate(magnitude, redValue, greenValue, blueValue);
 	}
 
-	bool SavePaletteToFile(std::string fileName);
+	bool DLL_EXPORT SavePaletteToFile(std::string fileName);
 
-	bool LoadPaletteFromFile(std::string fileName);
+	bool DLL_EXPORT LoadPaletteFromFile(std::string fileName);
 
-	void GenerateRandomColorPalette();
+	void DLL_EXPORT GenerateRandomColorPalette();
 
 };

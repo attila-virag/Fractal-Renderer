@@ -108,8 +108,9 @@ public:
 		if (inFile.is_open()) {
 
 			Deserialize(inFile);
+			return true;
 		}
-		else return false;
+		return false;
 	}
 
 	bool Serialize(std::ofstream& outFile)

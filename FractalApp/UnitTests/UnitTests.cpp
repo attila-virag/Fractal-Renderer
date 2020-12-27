@@ -107,8 +107,6 @@ namespace UnitTests
 
 			if (outFile.is_open()) {
 
-				outFile << "X: " << std::endl;
-
 				r.Serialize(outFile);
 
 			}
@@ -126,6 +124,64 @@ namespace UnitTests
 			}
 
 			Assert::IsTrue(r.AreEqual(r2));
+		}
+
+		TEST_METHOD(SerializeMultiple)
+		{
+			int xRange = 500;
+			int yRange = 500;
+
+			std::list<Result> outResults;
+			std::list<Result> inResults;
+
+			std::ofstream outFile;
+
+			std::string filePath = workingDirectory + "results\\" + "serializeTest" + ".txt";
+
+			outFile.open(filePath);
+
+			if (outFile.is_open()) {
+
+				for (int i = 0; i < xRange; i++) {
+					for (int j = 0; j < yRange; j++) {
+						Result r;
+						r.x_pixel = i+20;
+						r.y_pixel = j+20;
+						r.finalAngle = (double)i * j;
+						r.finalMagnitude = (double)i * j;
+
+						r.Serialize(outFile);
+						outResults.push_back(r);
+					}
+				}
+
+				outFile.close();
+
+				std::ifstream inFile;
+
+				inFile.open(filePath);
+
+				if (inFile.is_open()) {
+					for (int i = 0; i < xRange; i++) {
+						for (int j = 0; j < yRange; j++) {
+							Result r;
+							r.Deserialize(inFile);
+							inResults.push_back(r);
+						}
+					}
+				}
+
+				inFile.close();
+				
+				for (int i = 0; i < xRange * yRange; i++) {
+					Result r1 = inResults.front();
+					inResults.pop_front();
+					Result r2 = outResults.front();
+					outResults.pop_front();
+					Assert::IsTrue(r1.AreEqual(r2));
+				}
+
+			}
 		}
 
 		TEST_METHOD(TestMandelbrot)

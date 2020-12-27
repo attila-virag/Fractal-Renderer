@@ -20,6 +20,8 @@ struct Result {
 
 	double finalMagnitude = 0;
 
+	bool escaped = true;
+
 	bool AreEqual(const Result& other)
 	{
 		return (this->version == other.version && this->x_pixel == other.x_pixel && this->y_pixel == other.y_pixel && this->finalIteration == other.finalIteration &&
@@ -86,9 +88,9 @@ struct Result {
 
 		inFile >> escaped;
 
+		std::getline(inFile, line);
 	}
 
-	bool escaped;
 };
 
 typedef void(*FractalFunction)(Result *r);
@@ -109,7 +111,7 @@ enum class ColorScheme {
 	FinalMagnitude
 };
 
-class DLL_EXPORT FractalAlgorithm {
+class FractalAlgorithm {
 
 	void ShowColorPalette(Result* pt);
 
@@ -127,6 +129,8 @@ class DLL_EXPORT FractalAlgorithm {
 
 	bool CheckIfPointIsInside(double x, double y);
 
+	std::unordered_map<int, int> histogramCount; // this map holds the counts for the histogram method, <escape iteration number, number of pixels in buket>
+
 public:
 
 	double m_pow{ 2 };
@@ -134,8 +138,6 @@ public:
 	Zoom* m_zoom;
 
 	ColorPalette* m_color;
-
-	std::unordered_map<int, int> histogramCount; // this map holds the counts for the histogram method, <escape iteration number, number of pixels in buket>
 
 	double max_mag = 0; // the maximum magnitude calculated
 	double min_mag = 0; // the minimum magnitude calculated (should be 1 or 0)
@@ -146,13 +148,13 @@ public:
 	AlgorithmType algoType = AlgorithmType::MandelBrot;
 	ColorScheme colorScheme = ColorScheme::IterationCount;
 
-	FractalAlgorithm(Zoom *zoom, ColorPalette * palette);
+	DLL_EXPORT FractalAlgorithm(Zoom *zoom, ColorPalette * palette);
 
 	// this method will run in multiple threads
-	void CalculatePoint(Result* pt);
+	void DLL_EXPORT CalculatePoint(Result* pt);
 
 	// for each point normalizes the magnitude value based on whatever smoothing methodology applied
-	void GetNormalization(Result * pt);
+	void DLL_EXPORT GetNormalization(Result * pt);
 
 	
 };
