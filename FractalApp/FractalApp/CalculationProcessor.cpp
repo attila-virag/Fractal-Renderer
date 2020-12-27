@@ -3,6 +3,10 @@
 
 #include "BitmapWriter.h"
 
+//#ifdef _WIN32
+#include <Windows.h>
+//#else
+
 #include <thread>
 #include <functional>
 
@@ -49,6 +53,127 @@ bool CalculationProcessor::IsQueueEmpty()
 {
 	std::lock_guard<mutex> locker(_mu1);
 	return pointQueue.empty();
+}
+
+int CalculationProcessor::GetQueueSize()
+{
+	std::lock_guard<mutex> locker(_mu1);
+	return pointQueue.size();
+}
+
+// will spawn 
+bool CalculationProcessor::CalculatePoints(const std::string& fileName)
+{
+	// record start time
+	startTime = GetTimeNow();
+
+	// this prepares out pixels that we will calculate with Result structs
+	for (int h = 0; h < m_algo->m_zoom->pixels; h++) {
+		for (int w = 0; w < m_algo->m_zoom->pixels; w++) {
+			AddPointToQueue(w, h);
+		}
+	}
+
+
+	std::thread t(&CalculationProcessor::ReportProgress, this);
+	t.detach();
+
+	vector<thread> threadList;
+
+	for (unsigned int t = 0; t < m_concurrency; t++) {
+		threadList.push_back(thread(&CalculationProcessor::CalculatePoint, this, t));
+	}
+
+	// thread to write results out to file
+	std::thread rt(&CalculationProcessor::SaveResults, this, fileName);
+	rt.detach();
+
+	for_each(threadList.begin(), threadList.end(), std::mem_fn(&std::thread::join));
+
+	return true;
+}
+
+void CalculationProcessor::ReportProgress()
+{
+	while (!IsQueueEmpty()) {
+		long long timeNow = GetTimeNow();
+		long long runningTime = timeNow - startTime;
+
+		int queueSize = GetQueueSize();
+		double percentComplete = 100*(1.0 - (queueSize / ((double)m_algo->m_zoom->pixels * m_algo->m_zoom->pixels)));
+		double resultsComplete = 100 * (resultsWritten / ((double)m_algo->m_zoom->pixels * m_algo->m_zoom->pixels));
+
+		std::cout << "Calculation Percent Complete: " << percentComplete << " Time elapsed: " << runningTime << std::endl;
+		std::cout << "Results written percent complete: " << resultsComplete << std::endl;
+		Sleep(2000);
+	}
+
+	while (!IsResultQueueEmpty()) {
+		long long timeNow = GetTimeNow();
+		long long runningTime = timeNow - startTime;
+
+		double resultsComplete = 100 * (resultsWritten / ((double)m_algo->m_zoom->pixels * m_algo->m_zoom->pixels));
+		std::cout << "Results written percent complete: " << resultsComplete << " Time elapsed: " << runningTime << std::endl;
+		Sleep(2000);
+
+	}
+	// we just return once done
+}
+
+void CalculationProcessor::SaveResult(std::mutex* mu, std::ofstream* outFile) 
+{
+	while (!IsQueueEmpty()) {
+		if (!IsResultQueueEmpty()) {
+			// write result out to file
+			auto p = GetNextResult();
+			std::lock_guard<mutex> locker(*mu);
+			p->Serialize(*outFile);
+			resultsWritten++;
+		}
+		else {
+			Sleep(2);
+		}
+	}
+
+	// once the queue is empty see if there is still some in the result queue left
+	while (!IsResultQueueEmpty()) {
+		auto p = GetNextResult();
+		std::lock_guard<mutex> locker(*mu);
+		p->Serialize(*outFile);
+		resultsWritten++;
+	}
+}
+
+void CalculationProcessor::SaveResults(std::string fileName)
+{
+	resultsWritten = 0;
+
+	std::ofstream outFile;
+
+	std::string filePath = workingDirectory + "results\\" + fileName+ ".txt";
+
+	outFile.open(filePath);
+
+	if (!outFile.is_open()) {
+		// error
+		std::cout << "Unable to open file" << std::endl;
+		return;
+	}
+
+	m_algo->m_zoom->Serialize(outFile);
+
+	mutex mu;
+
+	vector<thread> threadList;
+	int threads = 2;
+
+	for (unsigned int t = 0; t < threads; t++) {
+		threadList.push_back(thread(&CalculationProcessor::SaveResult, this, &mu, &outFile));
+	}
+
+	for_each(threadList.begin(), threadList.end(), std::mem_fn(&std::thread::join));
+
+	outFile.close();
 }
 
 // the result queue can be processed as soon as there 

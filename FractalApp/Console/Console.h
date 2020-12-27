@@ -219,7 +219,7 @@ void RenderImage(void * proc) {
 		int option = 1;
 
 		cout << "Please enter a generation option: " << std::endl;
-		cout << "1 = Generate 500x500 Preview , 2 = Write Results to File, 3 = Generate image from File, 4 = Generate full image " << std::endl;
+		cout << "1 = Generate 500x500 Preview , 2 = Calculate and Write Results to File, 3 = Generate image from File, 4 = Generate full image " << std::endl;
 		cin >> option;
 
 		switch (option) {
@@ -230,7 +230,7 @@ void RenderImage(void * proc) {
 		}
 		case 2: 
 		{
-
+			CalculatePoints(proc, name.c_str());
 			// save all iteration data to a file
 			break;
 		}
@@ -241,28 +241,16 @@ void RenderImage(void * proc) {
 		}
 		case 4:
 		{
+			if (done == 1) {
+				GenerateImage(proc, name.c_str());
+			}
+			else if (done == 2) {
+				SetLocation(proc);
+			}
 			// generates and and image in one
 			break;
 		}
 		default:;
-		}
-
-		int preview = 0;
-		cout << "Enter 1 to generate 500X500 preview : " << std::endl;
-		cin >> preview;
-
-		if (preview == 1) {
-			GeneratePreview(proc, name.c_str());
-		}
-
-		cout << "Enter 1 to generate full image, enter 2 to change coordinates: " << std::endl;
-		cin >> done;
-
-		if (done == 1) {
-			GenerateImage(proc, name.c_str());
-		}
-		else if (done == 2) {
-			SetLocation(proc);
 		}
 
 		cout << "Enter 0 to continue or enter 1 to return to main menu" << std::endl;

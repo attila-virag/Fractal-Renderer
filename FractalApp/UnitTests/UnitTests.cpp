@@ -126,7 +126,7 @@ namespace UnitTests
 			Assert::IsTrue(r.AreEqual(r2));
 		}
 
-		TEST_METHOD(SerializeMultiple)
+		TEST_METHOD(SerializeMultipleResults)
 		{
 			int xRange = 500;
 			int yRange = 500;

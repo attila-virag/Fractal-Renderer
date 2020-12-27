@@ -244,6 +244,16 @@ extern "C" {
 		return true;
 	}
 
+	bool CalculatePoints(void* instPtr, const char* filename)
+	{
+
+		auto proc = ((CalculationProcessor*)instPtr);
+
+		proc->CalculatePoints(std::string(filename));
+
+		return true;
+	}
+
 	bool GenerateImage(void* instPtr, const char* filename)
 	{
 		auto proc = ((CalculationProcessor*)instPtr);

@@ -48,4 +48,6 @@ extern "C" {
 	bool DLL_EXPORT GeneratePreview(void* instPtr, const char* filename);
 
 	bool DLL_EXPORT GenerateImage(void* instPtr, const char* filename);
+
+	bool DLL_EXPORT CalculatePoints(void* instPtr, const char* filename);
 }

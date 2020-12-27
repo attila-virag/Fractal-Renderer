@@ -11,6 +11,7 @@
 #include <vector>
 #include <memory>
 #include <mutex>
+#include <chrono>
 
 using std::queue;
 using std::vector;
@@ -31,6 +32,9 @@ private:
 
 	queue <unique_ptr<Result>> resultQueue;
 
+	long long startTime = 0;
+
+	int resultsWritten = 0;
 
 	unsigned int m_concurrency{ 2 };
 
@@ -43,6 +47,8 @@ private:
 
 	//queue.empty() is not thread safe
 	bool IsQueueEmpty();
+
+	int GetQueueSize();
 
 	bool IsResultQueueEmpty();
 
@@ -58,6 +64,14 @@ private:
 	// single thread
 	void WriteImage(std::string fileName);
 
+	long long GetTimeNow() { return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count(); }
+
+	void ReportProgress();
+
+	void SaveResults(std::string fileName);
+
+	void SaveResult(std::mutex* mu, std::ofstream* outFile);
+
 public:
 
 	FractalFunction m_func = nullptr;
@@ -66,6 +80,8 @@ public:
 	DLL_EXPORT CalculationProcessor(FractalAlgorithm* algo,  int threads = 0);
 
 	DLL_EXPORT ~CalculationProcessor();
+
+	bool DLL_EXPORT CalculatePoints(const std::string& fileName);
 
 	bool DLL_EXPORT LoadResultFromFile(std::string filename);
 
