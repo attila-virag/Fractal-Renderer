@@ -6,6 +6,8 @@
 #include <iostream>
 #include <unordered_map>
 
+// the result struct holds the outcome of the algorithms applied to each pixel
+// 
 struct Result {
 
 	int version = 1;
@@ -14,81 +16,58 @@ struct Result {
 	int x_pixel = 0;
 	int y_pixel = 0;
 
-	int finalIteration = 0;
-
-	double finalAngle = 0;
-
-	double finalMagnitude = 0;
-
+	// Version 1:
+	int int1 = 0;
+	int int2 = 0;
+	double double1 = 0;
+	double double2 = 0;
 	bool escaped = true;
 
 	bool AreEqual(const Result& other)
 	{
-		return (this->version == other.version && this->x_pixel == other.x_pixel && this->y_pixel == other.y_pixel && this->finalIteration == other.finalIteration &&
-			this->finalAngle == other.finalAngle && this->finalMagnitude == other.finalMagnitude);
+		if (this->version == 1) {
+			return (this->version == other.version && this->x_pixel == other.x_pixel && this->y_pixel == other.y_pixel && this->int1 == other.int1 &&
+				this->int2 == other.int2 && this->double1 == other.double1 && this->double2 == other.double2 && this->escaped == other.escaped);
+		}
+		return false;
 	}
 
 	void Serialize(std::ofstream& outFile)
 	{
-		outFile << "X: " << std::endl;
-
-		outFile << x_pixel << std::endl;
-
-		outFile << "Y: " << std::endl;
-
-		outFile << y_pixel << std::endl;
-
-		outFile << "finalIteration: " << std::endl;
-
-		outFile << finalIteration << std::endl;
-
-		outFile << "finalAngle: " << std::endl;
-
-		outFile << finalAngle << std::endl;
-		
-		outFile << "finalMagnitude: " << std::endl;
-
-		outFile << finalMagnitude << std::endl;
-
-		outFile << "escaped: " << std::endl;
-
-		outFile << escaped << std::endl;
-
+		//outFile.write((char*)this, sizeof(this));
+		int boundary = 1001;
+		outFile.write(reinterpret_cast<const char*> (&boundary), sizeof(int));
+		outFile.write(reinterpret_cast<const char*> (&version), sizeof(int));
+		outFile.write(reinterpret_cast<const char*> (&x_pixel), sizeof(int));
+		outFile.write(reinterpret_cast<const char*> (&y_pixel), sizeof(int));
+		outFile.write(reinterpret_cast<const char*> (&int1), sizeof(int));
+		outFile.write(reinterpret_cast<const char*> (&int2), sizeof(int));
+		outFile.write(reinterpret_cast<const char*> (&double1), sizeof(double));
+		outFile.write(reinterpret_cast<const char*> (&double2), sizeof(double));
+		outFile.write(reinterpret_cast<const char*> (&escaped), sizeof(bool));
+		outFile.write(reinterpret_cast<const char*> (&boundary), sizeof(int));
 	}
 
 	void Deserialize(std::ifstream& inFile)
 	{
-		std::string line;
-		std::getline(inFile, line);
+		//Result r;
+		//inFile.read((char*)&r, sizeof(this));
 
-		inFile >> x_pixel;
-
-		std::getline(inFile, line);
-		std::getline(inFile, line);
-
-		inFile >> y_pixel;
-
-		std::getline(inFile, line);
-		std::getline(inFile, line);
-
-		inFile >> finalIteration;
-
-		std::getline(inFile, line);
-		std::getline(inFile, line);
-
-		inFile >> finalAngle;
-
-		std::getline(inFile, line);
-		std::getline(inFile, line);
-
-		inFile >> finalMagnitude;
-
-		std::getline(inFile, line);
-		std::getline(inFile, line);
-
-		inFile >> escaped;
-
-		std::getline(inFile, line);
+		int boundary;
+		inFile.read((char*)&boundary, sizeof(int));
+		inFile.read((char*)&version, sizeof(int));
+		if (version == 1) {
+			inFile.read((char*)&x_pixel, sizeof(int));
+			inFile.read((char*)&y_pixel, sizeof(int));
+			inFile.read((char*)&int1, sizeof(int));
+			inFile.read((char*)&int2, sizeof(int));
+			inFile.read((char*)&double1, sizeof(double));
+			inFile.read((char*)&double2, sizeof(double));
+			inFile.read((char*)&escaped, sizeof(bool));
+			inFile.read((char*)&boundary, sizeof(int));
+			return;
+		}
+		std::cout << "Error: file version: " << version << " is not supported" << std::endl;
 	}
 
 };

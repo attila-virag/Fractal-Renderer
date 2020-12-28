@@ -91,19 +91,19 @@ namespace UnitTests
 			double angle = 200;
 
 			Result r;
-
+			r.version = 1;
 			r.escaped = true;
 			r.x_pixel = x;
 			r.y_pixel = y;
 
-			r.finalAngle = angle;
-			r.finalMagnitude = mag;
+			r.double1 = angle;
+			r.double2 = mag;	
 
-			std::ofstream outFile;
+			std::string filePath = workingDirectory + "results\\" + "serializeTest" + ".bin";
 
-			std::string filePath = workingDirectory + "results\\" + "serializeTest" + ".txt";
+			std::ofstream outFile;// (filePath, std::ofstream::binary);
 
-			outFile.open(filePath);
+			outFile.open(filePath, std::ios::out | std::ios::binary);
 
 			if (outFile.is_open()) {
 
@@ -115,11 +115,12 @@ namespace UnitTests
 
 			outFile.close();
 
-			std::ifstream inFile;
+			std::ifstream inFile;// (filePath, std::ifstream::binary);;
 
-			inFile.open(filePath);
+			inFile.open(filePath, std::ios::in | std::ios::binary);
 
 			if (inFile.is_open()) {
+				inFile.seekg(0);
 				r2.Deserialize(inFile);
 			}
 
@@ -136,9 +137,9 @@ namespace UnitTests
 
 			std::ofstream outFile;
 
-			std::string filePath = workingDirectory + "results\\" + "serializeTest" + ".txt";
+			std::string filePath = workingDirectory + "results\\" + "serializeTest" + ".bin";
 
-			outFile.open(filePath);
+			outFile.open(filePath, std::ios::out | std::ios::binary);
 
 			if (outFile.is_open()) {
 
@@ -147,8 +148,8 @@ namespace UnitTests
 						Result r;
 						r.x_pixel = i+20;
 						r.y_pixel = j+20;
-						r.finalAngle = (double)i * j;
-						r.finalMagnitude = (double)i * j;
+						r.double1 = (double)i * j;
+						r.double2 = (double)i * j;
 
 						r.Serialize(outFile);
 						outResults.push_back(r);
@@ -159,7 +160,7 @@ namespace UnitTests
 
 				std::ifstream inFile;
 
-				inFile.open(filePath);
+				inFile.open(filePath, std::ios::in | std::ios::binary);
 
 				if (inFile.is_open()) {
 					for (int i = 0; i < xRange; i++) {

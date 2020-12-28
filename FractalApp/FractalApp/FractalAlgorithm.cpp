@@ -8,7 +8,7 @@ using std::complex;
 // this will simply range the magnitude 0 -> 1 -> 0 going left to right
 void FractalAlgorithm::ShowColorPalette(Result * pt)
 {
-	pt->finalMagnitude = pt->x_pixel / (double)m_zoom->pixels;
+	pt->double1 = pt->x_pixel / (double)m_zoom->pixels;
 }
 
 // optimization to check if point is within cardioid or bulb
@@ -90,7 +90,7 @@ void FractalAlgorithm::MandelBrotSet(Result * pt)
 
 	switch(colorScheme) {
 		case ColorScheme::EscapeAngle:
-			pt->finalMagnitude = escapeAngle;
+			pt->double1 = escapeAngle;
 			break;
 		case ColorScheme::IterationCount :
 		{
@@ -100,11 +100,11 @@ void FractalAlgorithm::MandelBrotSet(Result * pt)
 			if (iterationsMax < iteration) {
 				iterationsMax = iteration;
 			}
-			pt->finalMagnitude = iteration;
+			pt->double1 = iteration;
 			break;
 		}
 		case ColorScheme::FinalMagnitude:
-			pt->finalMagnitude = magnitude;
+			pt->double1 = magnitude;
 	}
 
 	
@@ -135,15 +135,15 @@ void FractalAlgorithm::GetNormalization(Result* pt) {
 
 	if (colorScheme == ColorScheme::FinalMagnitude)
 	{
-		pt->finalMagnitude = sqrt(sqrt(pt->finalMagnitude / topMagnitude));
+		pt->double1 = sqrt(sqrt(pt->double1 / topMagnitude));
 	}
 	else if (colorScheme == ColorScheme::IterationCount)
 	{
-		pt->finalMagnitude = (pt->finalMagnitude - iterationsMin) / (iterationsMax - (double)iterationsMin);
+		pt->double1 = (pt->double1 - iterationsMin) / (iterationsMax - (double)iterationsMin);
 
 		// amplify some ranges as needed
 		// some square roots can push smaller values higher while still keeping the max at boundary 1
-		pt->finalMagnitude = sqrt(sqrt(sqrt(pt->finalMagnitude)));
+		pt->double1 = sqrt(sqrt(sqrt(pt->double1)));
 	}
 
 }

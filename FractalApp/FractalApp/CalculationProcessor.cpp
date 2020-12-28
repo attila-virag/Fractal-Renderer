@@ -150,9 +150,9 @@ void CalculationProcessor::SaveResults(std::string fileName)
 
 	std::ofstream outFile;
 
-	std::string filePath = workingDirectory + "results\\" + fileName+ ".txt";
+	std::string filePath = workingDirectory + "results\\" + fileName+ ".result";
 
-	outFile.open(filePath);
+	outFile.open(filePath, std::ios::out | std::ios::binary);
 
 	if (!outFile.is_open()) {
 		// error
@@ -165,7 +165,7 @@ void CalculationProcessor::SaveResults(std::string fileName)
 	mutex mu;
 
 	vector<thread> threadList;
-	int threads = 2;
+	int threads = 4;
 
 	for (unsigned int t = 0; t < threads; t++) {
 		threadList.push_back(thread(&CalculationProcessor::SaveResult, this, &mu, &outFile));
@@ -235,7 +235,7 @@ void CalculationProcessor::ProcessResult() {
 		int blue = 0;
 
 		if (p->escaped || m_algo->algoType == AlgorithmType::ShowColorPalette) {
-			m_algo->m_color->GetColor(p->finalMagnitude, red, green, blue);
+			m_algo->m_color->GetColor(p->double1, red, green, blue);
 		}
 		m_redData[p->x_pixel][p->y_pixel] = red;
 		m_greenData[p->x_pixel][p->y_pixel ] = green;
