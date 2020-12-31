@@ -74,7 +74,6 @@ bool CalculationProcessor::CalculatePoints(const std::string& fileName)
 		}
 	}
 
-
 	std::thread t(&CalculationProcessor::ReportProgress, this);
 	t.detach();
 
@@ -102,9 +101,13 @@ void CalculationProcessor::ReportProgress()
 		int queueSize = GetQueueSize();
 		double percentComplete = 100*(1.0 - (queueSize / ((double)m_algo->m_zoom->pixels * m_algo->m_zoom->pixels)));
 		double resultsComplete = 100 * (resultsWritten / ((double)m_algo->m_zoom->pixels * m_algo->m_zoom->pixels));
-
-		std::cout << "Calculation Percent Complete: " << percentComplete << " Time elapsed: " << runningTime << std::endl;
-		std::cout << "Results written percent complete: " << resultsComplete << std::endl;
+		std::stringstream ss;
+		ss << "Calculation Percent Complete: " << percentComplete << " Time elapsed: " << runningTime << std::endl;
+		ss << "Results written percent complete: " << resultsComplete << std::endl;
+		std::cout << ss.str();	
+#ifdef _DEBUG
+		OutputDebugStringA(ss.str().c_str());
+#endif
 		Sleep(2000);
 	}
 
@@ -113,7 +116,12 @@ void CalculationProcessor::ReportProgress()
 		long long runningTime = timeNow - startTime;
 
 		double resultsComplete = 100 * (resultsWritten / ((double)m_algo->m_zoom->pixels * m_algo->m_zoom->pixels));
-		std::cout << "Results written percent complete: " << resultsComplete << " Time elapsed: " << runningTime << std::endl;
+		std::stringstream ss;
+		ss << "Results written percent complete: " << resultsComplete << " Time elapsed: " << runningTime << std::endl;
+		std::cout << ss.str();
+#ifdef _DEBUG
+		OutputDebugStringA(ss.str().c_str());
+#endif
 		Sleep(2000);
 
 	}
@@ -126,6 +134,9 @@ void CalculationProcessor::SaveResult(std::mutex* mu, std::ofstream* outFile)
 		if (!IsResultQueueEmpty()) {
 			// write result out to file
 			auto p = GetNextResult();
+			if (p == nullptr) {
+				continue;
+			}
 			std::lock_guard<mutex> locker(*mu);
 			p->Serialize(*outFile);
 			resultsWritten++;

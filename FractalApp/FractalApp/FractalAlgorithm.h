@@ -35,24 +35,24 @@ struct Result {
 	void Serialize(std::ofstream& outFile)
 	{
 		//outFile.write((char*)this, sizeof(this));
-		int boundary = 1001;
-		outFile.write(reinterpret_cast<const char*> (&boundary), sizeof(int));
-		outFile.write(reinterpret_cast<const char*> (&version), sizeof(int));
-		outFile.write(reinterpret_cast<const char*> (&x_pixel), sizeof(int));
-		outFile.write(reinterpret_cast<const char*> (&y_pixel), sizeof(int));
-		outFile.write(reinterpret_cast<const char*> (&int1), sizeof(int));
-		outFile.write(reinterpret_cast<const char*> (&int2), sizeof(int));
-		outFile.write(reinterpret_cast<const char*> (&double1), sizeof(double));
-		outFile.write(reinterpret_cast<const char*> (&double2), sizeof(double));
-		outFile.write(reinterpret_cast<const char*> (&escaped), sizeof(bool));
-		outFile.write(reinterpret_cast<const char*> (&boundary), sizeof(int));
+		if (version == 1) {
+			int boundary = 1001;
+			outFile.write(reinterpret_cast<const char*> (&boundary), sizeof(int));
+			outFile.write(reinterpret_cast<const char*> (&version), sizeof(int));
+			outFile.write(reinterpret_cast<const char*> (&x_pixel), sizeof(int));
+			outFile.write(reinterpret_cast<const char*> (&y_pixel), sizeof(int));
+			outFile.write(reinterpret_cast<const char*> (&int1), sizeof(int));
+			outFile.write(reinterpret_cast<const char*> (&int2), sizeof(int));
+			outFile.write(reinterpret_cast<const char*> (&double1), sizeof(double));
+			outFile.write(reinterpret_cast<const char*> (&double2), sizeof(double));
+			outFile.write(reinterpret_cast<const char*> (&escaped), sizeof(bool));
+			outFile.write(reinterpret_cast<const char*> (&boundary), sizeof(int));
+			return;
+		}
 	}
 
 	void Deserialize(std::ifstream& inFile)
 	{
-		//Result r;
-		//inFile.read((char*)&r, sizeof(this));
-
 		int boundary;
 		inFile.read((char*)&boundary, sizeof(int));
 		inFile.read((char*)&version, sizeof(int));

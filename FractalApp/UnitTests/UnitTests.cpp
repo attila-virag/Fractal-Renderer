@@ -66,7 +66,7 @@ namespace UnitTests
 
 		TEST_METHOD(TestLoadSaveLocation)
 		{
-			Zoom zoom(1,1,1,500);
+			Zoom zoom(-0.773774,-.11766,0.001,1500);
 			
 			Assert::IsTrue(zoom.SaveZoomDataToFile("test"));
 
@@ -101,7 +101,7 @@ namespace UnitTests
 
 			std::string filePath = workingDirectory + "results\\" + "serializeTest" + ".bin";
 
-			std::ofstream outFile;// (filePath, std::ofstream::binary);
+			std::ofstream outFile;
 
 			outFile.open(filePath, std::ios::out | std::ios::binary);
 
@@ -115,7 +115,7 @@ namespace UnitTests
 
 			outFile.close();
 
-			std::ifstream inFile;// (filePath, std::ifstream::binary);;
+			std::ifstream inFile;
 
 			inFile.open(filePath, std::ios::in | std::ios::binary);
 
@@ -185,9 +185,18 @@ namespace UnitTests
 			}
 		}
 
-		TEST_METHOD(TestMandelbrot)
+		TEST_METHOD(TestGenerateResults)
 		{
+			auto pZoom = new Zoom(-0.773774, -.11766, 0.001, 1500);
+			auto pColor = new ColorPalette();
+			pColor->GenerateRandomColorPalette();
+			auto pAlgo = new FractalAlgorithm(pZoom, pColor);
+			pAlgo->algoType = AlgorithmType::MandelBrot;
+			pAlgo->colorScheme = ColorScheme::IterationCount;
 
+			auto pProc = new  CalculationProcessor(pAlgo);
+
+			pProc->CalculatePoints("testGenerateResults");
 		}
 	};
 }

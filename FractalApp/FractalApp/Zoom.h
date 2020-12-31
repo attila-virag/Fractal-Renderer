@@ -96,18 +96,12 @@ public:
 
 		std::string filePath = workingDirectory + "locations\\"+ fileName + ".txt";
 
-		inFile.open(filePath);
-
-		std::string line;
-
-		double xCenter = 0;
-		double yCenter = 0;
-		double zoom = 0;
-		int pixels = 0;
+		inFile.open(filePath, std::ios::in | std::ios::binary);
 
 		if (inFile.is_open()) {
 
 			Deserialize(inFile);
+			inFile.close();
 			return true;
 		}
 		return false;
@@ -117,21 +111,10 @@ public:
 	{
 		if (outFile.is_open())
 		{
-			outFile << "X Center: " << std::endl;
-
-			outFile << x_center << std::endl;
-
-			outFile << "Y Center: " << std::endl;
-
-			outFile << y_center << std::endl;
-
-			outFile << "Zoom: " << std::endl;
-
-			outFile << zoom << std::endl;
-
-			outFile << "Pixels: " << std::endl;
-
-			outFile << pixels << std::endl;
+			outFile.write((char*)&x_center, sizeof(double));
+			outFile.write((char*)&y_center, sizeof(double));
+			outFile.write((char*)&zoom, sizeof(double));
+			outFile.write((char*)&pixels, sizeof(int));
 			return true;
 		}
 		return false;
@@ -140,34 +123,16 @@ public:
 	bool Deserialize(std::ifstream& inFile)
 	{
 		if (inFile.is_open()) {
-
-			std::string line;
-
 			double xCenter = 0;
 			double yCenter = 0;
 			double zoom = 0;
 			int pixels = 0;
 
-			getline(inFile, line);
 
-			inFile >> xCenter;
-
-			getline(inFile, line);
-			getline(inFile, line);
-
-			inFile >> yCenter;
-
-			getline(inFile, line);
-			getline(inFile, line);
-
-			inFile >> zoom;
-
-			getline(inFile, line);
-			getline(inFile, line);
-
-			inFile >> pixels;
-
-			inFile.close();
+			inFile.read((char*)&xCenter, sizeof(double));
+			inFile.read((char*)&yCenter, sizeof(double));
+			inFile.read((char*)&zoom, sizeof(double));
+			inFile.read((char*)&pixels, sizeof(int));
 
 			ResetZoom(xCenter, yCenter, zoom, pixels);
 
@@ -180,9 +145,9 @@ public:
 	{
 		std::ofstream outFile;
 
-		std::string filePath = workingDirectory + "locations\\" + fileName + ".txt";
+		std::string filePath = workingDirectory + "locations\\" + fileName + ".bin";
 
-		outFile.open(filePath);
+		outFile.open(filePath, std::ios::out | std::ios::binary);
 
 		if (outFile.is_open()) {
 
