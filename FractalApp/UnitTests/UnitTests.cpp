@@ -3,8 +3,10 @@
 
 #include "ColorPalette.h"
 #include "Zoom.h"
-#include "FractalAlgorithm.h"
+#include "Algorithm.h"
+#include "Normalization.h"
 #include "CalculationProcessor.h"
+#include <list>
 
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -53,15 +55,15 @@ namespace UnitTests
 
 		TEST_METHOD(TestCreatePaletterBitmap)
 		{
-			Zoom zoom;
-			ColorPalette color;
-			FractalAlgorithm alg(&zoom, &color);
-
-			alg.algoType = AlgorithmType::ShowColorPalette;
-
-			CalculationProcessor proc(&alg, 8);
-
-			proc.CreatePicture("testPicture");
+			auto pZoom = new Zoom(0, 0, 1, 1500);
+			auto pColor = new ColorPalette();
+			auto pNorm = new Normalization(ParameterToNormalize::Int1, NormalizationMethod::SqrtSmoothing);
+			pColor->GenerateRandomColorPalette();
+			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::ShowColorPalette, pZoom);
+			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
+			pProc->CalculatePoints("paletteTest");
+			pProc->LoadResultFromFile("paletteTest");
+			pProc->CreatePicture("paletteTestPicture");
 		}
 
 		TEST_METHOD(TestLoadSaveLocation)
@@ -92,7 +94,7 @@ namespace UnitTests
 
 			Result r;
 			r.version = 1;
-			r.escaped = true;
+			r.active = true;
 			r.x_pixel = x;
 			r.y_pixel = y;
 
@@ -185,18 +187,34 @@ namespace UnitTests
 			}
 		}
 
-		TEST_METHOD(TestGenerateResults)
+		TEST_METHOD(TestGenerateMandelbrotResults)
 		{
 			auto pZoom = new Zoom(-0.773774, -.11766, 0.001, 1500);
 			auto pColor = new ColorPalette();
+			auto pNorm = new Normalization(ParameterToNormalize::Int1, NormalizationMethod::SqrtSmoothing);
 			pColor->GenerateRandomColorPalette();
-			auto pAlgo = new FractalAlgorithm(pZoom, pColor);
-			pAlgo->algoType = AlgorithmType::MandelBrot;
-			pAlgo->colorScheme = ColorScheme::IterationCount;
+			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::Mandelbrot, pZoom);
 
-			auto pProc = new  CalculationProcessor(pAlgo);
+			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
 
-			pProc->CalculatePoints("testGenerateResults");
+			pProc->CalculatePoints("testGenerateMandelbrotResults");
+
+			
+		}
+
+		// this assumes we generateda file above 
+		TEST_METHOD(TestLoadResultsFromFile)
+		{
+			auto pZoom = new Zoom();
+			auto pColor = new ColorPalette();
+			pColor->GenerateRandomColorPalette();
+			auto pNorm = new Normalization(ParameterToNormalize::Int1, NormalizationMethod::SqrtSmoothing);
+			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::Mandelbrot, pZoom);
+
+			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
+			pProc->LoadResultFromFile("testGenerateMandelbrotResults");
+
+			pProc->CreatePicture("testpicture");
 		}
 	};
 }

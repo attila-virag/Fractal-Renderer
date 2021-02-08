@@ -4,7 +4,9 @@
 // use helper struct in a queue
 
 //#include "ComplexCalculator.h"
-#include "FractalAlgorithm.h"
+#include "Algorithm.h"
+#include "Normalization.h"
+#include "ColorPalette.h"
 #include "BitmapWriter.h"
 
 #include <queue>
@@ -33,7 +35,6 @@ private:
 	queue <unique_ptr<Result>> resultQueue;
 
 	long long startTime = 0;
-
 	int resultsWritten = 0;
 
 	unsigned int m_concurrency{ 2 };
@@ -74,10 +75,12 @@ private:
 
 public:
 
-	FractalFunction m_func = nullptr;
-	FractalAlgorithm* m_algo = nullptr;
+	//FractalFunction m_func = nullptr;
+	Algorithm* m_algo = nullptr;
+	Normalization* m_norm = nullptr;
+	ColorPalette* m_color = nullptr;
 
-	DLL_EXPORT CalculationProcessor(FractalAlgorithm* algo,  int threads = 0);
+	DLL_EXPORT CalculationProcessor(Algorithm* algo, Normalization* m_norm, ColorPalette* color, int threads = 0);
 
 	DLL_EXPORT ~CalculationProcessor();
 

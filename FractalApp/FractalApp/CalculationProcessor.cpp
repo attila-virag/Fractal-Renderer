@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "CalculationProcessor.h"
-
+#include <sstream>
 #include "BitmapWriter.h"
 
 //#ifdef _WIN32
@@ -61,15 +61,15 @@ int CalculationProcessor::GetQueueSize()
 	return pointQueue.size();
 }
 
-// will spawn 
+// this function runs the point calculation algorithm and save the results to outfile
 bool CalculationProcessor::CalculatePoints(const std::string& fileName)
 {
 	// record start time
 	startTime = GetTimeNow();
 
 	// this prepares out pixels that we will calculate with Result structs
-	for (int h = 0; h < m_algo->m_zoom->pixels; h++) {
-		for (int w = 0; w < m_algo->m_zoom->pixels; w++) {
+	for (int h = 0; h < m_algo->GetZoom()->pixels; h++) {
+		for (int w = 0; w < m_algo->GetZoom()->pixels; w++) {
 			AddPointToQueue(w, h);
 		}
 	}
@@ -99,8 +99,8 @@ void CalculationProcessor::ReportProgress()
 		long long runningTime = timeNow - startTime;
 
 		int queueSize = GetQueueSize();
-		double percentComplete = 100*(1.0 - (queueSize / ((double)m_algo->m_zoom->pixels * m_algo->m_zoom->pixels)));
-		double resultsComplete = 100 * (resultsWritten / ((double)m_algo->m_zoom->pixels * m_algo->m_zoom->pixels));
+		double percentComplete = 100*(1.0 - (queueSize / ((double)m_algo->GetZoom()->pixels * m_algo->GetZoom()->pixels)));
+		double resultsComplete = 100 * (resultsWritten / ((double)m_algo->GetZoom()->pixels * m_algo->GetZoom()->pixels));
 		std::stringstream ss;
 		ss << "Calculation Percent Complete: " << percentComplete << " Time elapsed: " << runningTime << std::endl;
 		ss << "Results written percent complete: " << resultsComplete << std::endl;
@@ -115,7 +115,7 @@ void CalculationProcessor::ReportProgress()
 		long long timeNow = GetTimeNow();
 		long long runningTime = timeNow - startTime;
 
-		double resultsComplete = 100 * (resultsWritten / ((double)m_algo->m_zoom->pixels * m_algo->m_zoom->pixels));
+		double resultsComplete = 100 * (resultsWritten / ((double)m_algo->GetZoom()->pixels * m_algo->GetZoom()->pixels));
 		std::stringstream ss;
 		ss << "Results written percent complete: " << resultsComplete << " Time elapsed: " << runningTime << std::endl;
 		std::cout << ss.str();
@@ -171,7 +171,7 @@ void CalculationProcessor::SaveResults(std::string fileName)
 		return;
 	}
 
-	m_algo->m_zoom->Serialize(outFile);
+	m_algo->GetZoom()->Serialize(outFile);
 
 	mutex mu;
 
@@ -237,16 +237,14 @@ void CalculationProcessor::ProcessResult() {
 		auto p = GetNextResult();
 		if (p == nullptr) break;
 		
-		if (m_algo->algoType != AlgorithmType::ShowColorPalette) {
-			m_algo->GetNormalization(p.get());
-		}
+		double value = m_norm->GetNormalization(p.get());
 
 		int red = 0;
 		int green = 0;
 		int blue = 0;
 
-		if (p->escaped || m_algo->algoType == AlgorithmType::ShowColorPalette) {
-			m_algo->m_color->GetColor(p->double1, red, green, blue);
+		if (p->active) {
+			m_color->GetColor(value, red, green, blue);
 		}
 		m_redData[p->x_pixel][p->y_pixel] = red;
 		m_greenData[p->x_pixel][p->y_pixel ] = green;
@@ -258,13 +256,13 @@ void CalculationProcessor::ProcessResult() {
 
 void CalculationProcessor::PreparePoints()
 {
-	for (int h = 0; h < m_algo->m_zoom->pixels; h++) {
+	for (int h = 0; h < m_algo->GetZoom()->pixels; h++) {
 
 		vector<int> tempRed;
 		vector<int> tempGreen;
 		vector<int> tempBlue;
 
-		for (int w = 0; w < m_algo->m_zoom->pixels; w++) {
+		for (int w = 0; w < m_algo->GetZoom()->pixels; w++) {
 			tempRed.push_back(0);
 			tempGreen.push_back(0);
 			tempBlue.push_back(0);
@@ -282,14 +280,16 @@ void CalculationProcessor::PreparePoints()
 void CalculationProcessor::WriteImage(std::string fileName)
 {
 	// order red, blue, green
-	BitmapWriter bp(m_redData, m_blueData, m_greenData, m_algo->m_zoom->pixels, m_algo->m_zoom->pixels);
+	BitmapWriter bp(m_redData, m_blueData, m_greenData, m_algo->GetZoom()->pixels, m_algo->GetZoom()->pixels);
 
 	bp.WriteBitmap(fileName.c_str());
 
 }
 
-CalculationProcessor::CalculationProcessor(FractalAlgorithm* algo, int threads):
-	m_algo(algo)
+CalculationProcessor::CalculationProcessor(Algorithm* algo, Normalization* norm, ColorPalette* color, int threads):
+	m_algo(algo),
+	m_norm(norm),
+	m_color(color)
 {
 
 	// try to pull ideal concurency level of machine
@@ -315,34 +315,45 @@ CalculationProcessor::~CalculationProcessor()
 
 }
 
+//call this function when we have a result list
 void CalculationProcessor::CreatePicture(std::string fileName)
 {
-	// will create as many threads as derived from the conurency level and work throuhg the point queue
-	m_redData.clear();
-	m_blueData.clear();
-	m_greenData.clear();
-	
-	PreparePoints(); // generation could be its own thread
-
 	vector<thread> threadList;
 
-	// does all calculations and then all image generation, could be optimized
-
 	for (unsigned int t = 0; t < m_concurrency; t++) {
-		threadList.push_back(thread(&CalculationProcessor::CalculatePoint, this, t));
+		threadList.push_back(thread(&CalculationProcessor::ProcessResult, this));
 	}
 
 	for_each(threadList.begin(), threadList.end(), std::mem_fn(&std::thread::join));
 
-	//generatorThread.join();
-	vector<thread> threadList2; // TODO see about reusing the original thread vector
-
-	for (unsigned int t = 0; t < m_concurrency; t++) {
-		threadList2.push_back(thread(&CalculationProcessor::ProcessResult, this));
-	}
-
-	for_each(threadList2.begin(), threadList2.end(), std::mem_fn(&std::thread::join));
-
-
 	WriteImage(fileName);
 }
+
+bool CalculationProcessor::LoadResultFromFile(std::string filename)
+{
+	std::string filePath = workingDirectory + "results\\" + filename + ".result";
+	std::ifstream inFile;
+
+	inFile.open(filePath, std::ios::in | std::ios::binary);
+
+	if (inFile.is_open()) {
+		m_algo->GetZoom()->Deserialize(inFile);
+		for (int i = 0; i < m_algo->GetZoom()->pixels; i++) {
+			for (int j = 0; j < m_algo->GetZoom()->pixels; j++) {
+				Result r;
+				r.Deserialize(inFile);
+
+				// do some data processing here - find max, min of data values
+				m_norm->CollectMinMaxData(&r);
+
+				std::unique_ptr<Result> p(new Result(r));
+				resultQueue.push(std::move(p));
+			}
+		}
+	}
+	else {
+		return false;
+	}
+
+}
+

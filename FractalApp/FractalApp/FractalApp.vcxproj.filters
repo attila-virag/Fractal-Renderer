@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Algorithms">
+      <UniqueIdentifier>{f8fc5edc-1ac4-4cd3-95c5-d8fb42e9254d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Algorithms">
+      <UniqueIdentifier>{329a2452-ed9a-4c73-a869-c0dc96227b18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Normalization">
+      <UniqueIdentifier>{65786a2a-42bb-4b73-b4b5-103c06e6efbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Normalization">
+      <UniqueIdentifier>{90af5840-5f28-44d8-af3b-a199b6027f6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -33,9 +45,6 @@
     <ClInclude Include="CalculationProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FractalAlgorithm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BitmapWriter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -44,6 +53,21 @@
     </ClInclude>
     <ClInclude Include="Exports.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Algorithm.h">
+      <Filter>Header Files\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="FractalAlgorithm.h">
+      <Filter>Header Files\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="MandelbrotSet.h">
+      <Filter>Header Files\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="ShowColorPalette.h">
+      <Filter>Header Files\Algorithms</Filter>
+    </ClInclude>
+    <ClInclude Include="Normalization.h">
+      <Filter>Header Files\Normalization</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -56,14 +80,23 @@
     <ClCompile Include="CalculationProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FractalAlgorithm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BitmapWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FractalEngine.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FractalAlgorithm.cpp">
+      <Filter>Source Files\Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="MandelbrotSet.cpp">
+      <Filter>Source Files\Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="Algorithm.cpp">
+      <Filter>Source Files\Algorithms</Filter>
+    </ClCompile>
+    <ClCompile Include="Normalization.cpp">
+      <Filter>Source Files\Normalization</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

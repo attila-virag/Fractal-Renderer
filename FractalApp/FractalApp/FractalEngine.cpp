@@ -9,44 +9,46 @@
 extern "C" {
 	bool CreateFractalEngine(void** instPtr)
 	{
-		auto pZoom = new Zoom();
-		auto pColor = new ColorPalette();
-		auto pAlgo = new FractalAlgorithm(pZoom, pColor);
-		auto pProc = new  CalculationProcessor(pAlgo);
+		return true;
+		//auto pZoom = new Zoom();
+		//auto pColor = new ColorPalette();
+		//auto pAlgo = new Algorithm(pZoom, pColor);
+		//auto pProc = new  CalculationProcessor(pAlgo);
 
-		// load the deafault files
-		pZoom->LoadZoomDataFromFile("default");
-		pColor->LoadPaletteFromFile("default");
+		//// load the deafault files
+		//pZoom->LoadZoomDataFromFile("default");
+		//pColor->LoadPaletteFromFile("default");
 
-		*instPtr = (void*)pProc;
+		//*instPtr = (void*)pProc;
 
-		if (*instPtr == nullptr)
-			return false;
-		else return true;
+		//if (*instPtr == nullptr)
+		//	return false;
+		//else return true;
 	}
 
 	bool CleanUp(void** instPtr)
 	{
-		if (instPtr != nullptr) {
+		//if (instPtr != nullptr) {
 
-			auto pProc = (CalculationProcessor*)instPtr;
+		//	auto pProc = (CalculationProcessor*)instPtr;
 
-			// lets save the palletes and coordinates as defaults
-			pProc->m_algo->m_zoom->SaveZoomDataToFile("default");
-			pProc->m_algo->m_color->SavePaletteToFile("default");
+		//	// lets save the palletes and coordinates as defaults
+		//	pProc->m_algo->m_zoom->SaveZoomDataToFile("default");
+		//	pProc->m_algo->m_color->SavePaletteToFile("default");
 
-			delete pProc;
+		//	delete pProc;
 
-			pProc = nullptr;
+		//	pProc = nullptr;
 
-		}
+		//}
 
 		return false;
 	}
 
 	bool SetAlgorithm(void* instPtr, int algoNumber)
 	{
-		if (instPtr != nullptr) {
+		return true;
+		/*if (instPtr != nullptr) {
 
 			switch (algoNumber) {
 			case 1: ((CalculationProcessor*)instPtr)->m_algo->algoType = AlgorithmType::MandelBrot; break;
@@ -56,20 +58,22 @@ extern "C" {
 
 			return true;
 		}
-		else return false;
+		else return false;*/
 	}
 
 	int GetAlgorithm(void* instPtr)
 	{
-		if (instPtr != nullptr) {
+		return 0;
+		/*if (instPtr != nullptr) {
 			return static_cast<int>(((CalculationProcessor*)instPtr)->m_algo->algoType);
 		}
-		else  return -1;
+		else  return -1;*/
 	}
 
 	bool SetColorAlgorithm(void* instPtr, int colorAlgoNumber)
 	{
-		if (instPtr != nullptr) {
+		return true;
+		/*if (instPtr != nullptr) {
 
 			switch (colorAlgoNumber) {
 			case 1: ((CalculationProcessor*)instPtr)->m_algo->colorScheme = ColorScheme::IterationCount; break;
@@ -81,165 +85,177 @@ extern "C" {
 
 			return true;
 		}
-		else return false;
+		else return false;*/
 	}
 
 	int GetColorAlgorithm(void* instPtr)
 	{
-		if (instPtr != nullptr) {
+		return 0;
+		/*if (instPtr != nullptr) {
 			return static_cast<int>(((CalculationProcessor*)instPtr)->m_algo->colorScheme);
 		}
-		else  return -1;
+		else  return -1;*/
 	}
 
 	bool Set_Pixels(void* instPtr, int pixels)
 	{
-		if (instPtr != nullptr) {
+		return true;
+		/*if (instPtr != nullptr) {
 
 			((CalculationProcessor*)instPtr)->m_algo->m_zoom->pixels = pixels;
 
 			return true;
 		}
-		else return false;
+		else return false;*/
 	}
 
 	int Get_Pixels(void* instPtr)
 	{
-			return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->pixels;
+		return 0;
+			/*return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->pixels;*/
 	}
 
 	bool Set_X_Value(void* instPtr, double x_value)
 	{
-		if (instPtr != nullptr) {
+		return 0;
+		/*if (instPtr != nullptr) {
 
 			((CalculationProcessor*)instPtr)->m_algo->m_zoom->x_center = x_value;
 
 			return true;
 		}
-		else return false;
+		else return false;*/
 	}
 
 	double Get_X_Value(void* instPtr)
 	{
-			return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->x_center;
+		return 0;
+			/*return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->x_center;*/
 	}
 
 	bool Set_Y_Value(void* instPtr, double y_value)
 	{
-		if (instPtr != nullptr) {
+		return true;
+		/*if (instPtr != nullptr) {
 
 			((CalculationProcessor*)instPtr)->m_algo->m_zoom->y_center = y_value;
 
 			return true;
 		}
-		else return false;
+		else return false;*/
 	}
 
 	double Get_Y_Value(void* instPtr)
 	{
-			return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->y_center;
+		return 0;
+			/*return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->y_center;*/
 	}
 
 	bool Set_Zoom(void* instPtr, double zoom)
 	{
-		if (instPtr != nullptr) {
+		return true;
+		/*if (instPtr != nullptr) {
 
 			((CalculationProcessor*)instPtr)->m_algo->m_zoom->zoom = zoom;
 
 			return true;
 		}
-		return false;
+		return false;*/
 	}
 
 	double Get_Zoom(void* instPtr)
 	{
-			return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->zoom;
+		return 0;
+			/*return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->zoom;*/
 	}
 
 	void DLL_EXPORT Reset_Zoom(void* instPtr)
 	{
-		((CalculationProcessor*)instPtr)->m_algo->m_zoom->ResetZoom();
+		/*((CalculationProcessor*)instPtr)->m_algo->m_zoom->ResetZoom();*/
 	}
 
 	bool LoadLocationFromFile(void* instPtr, const char* filename)
 	{
-		if (instPtr != nullptr) {
+		return true;
+		/*if (instPtr != nullptr) {
 
 			return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->LoadZoomDataFromFile(filename);
 		}
-		return false;
+		return false;*/
 	}
 
 	bool SaveLocationToFile(void* instPtr, const char* filename)
 	{
-		if (instPtr != nullptr) {
+		return true;
+		/*if (instPtr != nullptr) {
 
 			return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->SaveZoomDataToFile(filename);
 		}
-		return false;
+		return false;*/
 	}
 
 	bool LoadColorPaletteFromFile(void* instPtr, const char* filename)
 	{
-		if (instPtr != nullptr) {
+		return true;
+		/*if (instPtr != nullptr) {
 
 			return ((CalculationProcessor*)instPtr)->m_algo->m_color->LoadPaletteFromFile(filename);
 		}
-		return false;
+		return false;*/
 	}
 
 	bool GenerateRandomColorPalette(void* instPtr)
 	{
-		if (instPtr != nullptr) {
+		//if (instPtr != nullptr) {
 
-			auto proc = ((CalculationProcessor*)instPtr);
+		//	auto proc = ((CalculationProcessor*)instPtr);
 
-			auto algoType = proc->m_algo->algoType;
-			proc->m_algo->algoType = AlgorithmType::ShowColorPalette;
+		//	auto algoType = proc->m_algo->algoType;
+		//	proc->m_algo->algoType = AlgorithmType::ShowColorPalette;
 
-			double x_center = proc->m_algo->m_zoom->x_center;
-			double y_center = proc->m_algo->m_zoom->y_center;
-			double zoom = proc->m_algo->m_zoom->zoom;
+		//	double x_center = proc->m_algo->m_zoom->x_center;
+		//	double y_center = proc->m_algo->m_zoom->y_center;
+		//	double zoom = proc->m_algo->m_zoom->zoom;
 
-			proc->m_algo->m_zoom->ResetZoom(.5, .5, .5, proc->m_algo->m_zoom->pixels);
+		//	proc->m_algo->m_zoom->ResetZoom(.5, .5, .5, proc->m_algo->m_zoom->pixels);
 
-			proc->m_algo->m_color->GenerateRandomColorPalette();
+		//	proc->m_algo->m_color->GenerateRandomColorPalette();
 
-			// this will spawn the worker threads
-			proc->CreatePicture("randomColorPalette");
+		//	// this will spawn the worker threads
+		//	proc->CreatePicture("randomColorPalette");
 
-			proc->m_algo->algoType = algoType;
-			proc->m_algo->m_zoom->ResetZoom(x_center, y_center, zoom, proc->m_algo->m_zoom->pixels);
-			return true;
-		}
+		//	proc->m_algo->algoType = algoType;
+		//	proc->m_algo->m_zoom->ResetZoom(x_center, y_center, zoom, proc->m_algo->m_zoom->pixels);
+		//	return true;
+		//}
 		return false;
 	}
 
 	bool SaveColorPalette(void* instPtr, const char* filename)
 	{
-		if (instPtr != nullptr) {
+		//if (instPtr != nullptr) {
 
-			((CalculationProcessor*)instPtr)->m_algo->m_color->SavePaletteToFile(filename);
-			return true;
-		}
+		//	((CalculationProcessor*)instPtr)->m_algo->m_color->SavePaletteToFile(filename);
+		//	return true;
+		//}
 		return false;
 	}
 
 	bool GeneratePreview(void* instPtr, const char* filename)
 	{
-		auto proc = ((CalculationProcessor*)instPtr);
+		//auto proc = ((CalculationProcessor*)instPtr);
 
-		auto pixels = proc->m_algo->m_zoom->pixels;
+		//auto pixels = proc->m_algo->m_zoom->pixels;
 
-		proc->m_algo->m_zoom->pixels = 500;
+		//proc->m_algo->m_zoom->pixels = 500;
 
-		proc->m_algo->m_zoom->ResetZoom();
+		//proc->m_algo->m_zoom->ResetZoom();
 
-		proc->CreatePicture(std::string(filename) + "_preview");
+		//proc->CreatePicture(std::string(filename) + "_preview");
 
-		proc->m_algo->m_zoom->pixels = pixels;
+		//proc->m_algo->m_zoom->pixels = pixels;
 
-		proc->m_algo->m_zoom->ResetZoom();
+		//proc->m_algo->m_zoom->ResetZoom();
 
 		return true;
 	}
@@ -247,20 +263,20 @@ extern "C" {
 	bool CalculatePoints(void* instPtr, const char* filename)
 	{
 
-		auto proc = ((CalculationProcessor*)instPtr);
+		//auto proc = ((CalculationProcessor*)instPtr);
 
-		proc->CalculatePoints(std::string(filename));
+		//proc->CalculatePoints(std::string(filename));
 
 		return true;
 	}
 
 	bool GenerateImage(void* instPtr, const char* filename)
 	{
-		auto proc = ((CalculationProcessor*)instPtr);
+		//auto proc = ((CalculationProcessor*)instPtr);
 
-		auto pixels = proc->m_algo->m_zoom->pixels;
+		//auto pixels = proc->m_algo->m_zoom->pixels;
 
-		proc->CreatePicture(std::string(filename));
+		//proc->CreatePicture(std::string(filename));
 
 		return true;
 	}
