@@ -158,6 +158,7 @@ void CalculationProcessor::SaveResult(std::mutex* mu, std::ofstream* outFile)
 void CalculationProcessor::SaveResults(std::string fileName)
 {
 	resultsWritten = 0;
+	writingResults = true;
 
 	std::ofstream outFile;
 
@@ -185,6 +186,7 @@ void CalculationProcessor::SaveResults(std::string fileName)
 	for_each(threadList.begin(), threadList.end(), std::mem_fn(&std::thread::join));
 
 	outFile.close();
+	writingResults = false;
 }
 
 // the result queue can be processed as soon as there 
@@ -243,6 +245,12 @@ void CalculationProcessor::ProcessResult() {
 		int green = 0;
 		int blue = 0;
 
+		if (value == 0) {
+			red = 0;
+			green = 0;
+			blue = 0;
+		}
+
 		if (p->active) {
 			m_color->GetColor(value, red, green, blue);
 		}
@@ -258,6 +266,19 @@ void CalculationProcessor::PreparePoints()
 {
 	for (int h = 0; h < m_algo->GetZoom()->pixels; h++) {
 
+		for (int w = 0; w < m_algo->GetZoom()->pixels; w++) {
+
+			AddPointToQueue(w, h);
+		}
+	}
+}
+
+
+void CalculationProcessor::PrepareRGBVectors() 
+{
+
+	for (int h = 0; h < m_algo->GetZoom()->pixels; h++) {
+
 		vector<int> tempRed;
 		vector<int> tempGreen;
 		vector<int> tempBlue;
@@ -266,8 +287,6 @@ void CalculationProcessor::PreparePoints()
 			tempRed.push_back(0);
 			tempGreen.push_back(0);
 			tempBlue.push_back(0);
-
-			AddPointToQueue(w, h);
 		}
 
 		m_redData.push_back(tempRed);
@@ -338,16 +357,16 @@ bool CalculationProcessor::LoadResultFromFile(std::string filename)
 
 	if (inFile.is_open()) {
 		m_algo->GetZoom()->Deserialize(inFile);
+		PrepareRGBVectors();
 		for (int i = 0; i < m_algo->GetZoom()->pixels; i++) {
 			for (int j = 0; j < m_algo->GetZoom()->pixels; j++) {
-				Result r;
-				r.Deserialize(inFile);
+				std::unique_ptr<Result> r(new Result());
+				r->Deserialize(inFile);
 
 				// do some data processing here - find max, min of data values
-				m_norm->CollectMinMaxData(&r);
+				m_norm->CollectMinMaxData(r.get());
 
-				std::unique_ptr<Result> p(new Result(r));
-				resultQueue.push(std::move(p));
+				resultQueue.push(std::move(r));
 			}
 		}
 	}

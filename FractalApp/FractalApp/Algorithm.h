@@ -2,7 +2,7 @@
 #include "Zoom.h"
 #include "Exports.h"
 
-enum class AlgorithmType {
+enum class DLL_EXPORT AlgorithmType {
 
 	ShowColorPalette,
 	Polynomial,
@@ -134,6 +134,6 @@ public:
 
 	AlgorithmType GetAlgorithmType() { return m_algoType; }
 
-	static Algorithm* CreateAlgorithm(AlgorithmType type, Zoom* zoom);
+	DLL_EXPORT static Algorithm*  CreateAlgorithm(AlgorithmType type, Zoom* zoom);
 
 };

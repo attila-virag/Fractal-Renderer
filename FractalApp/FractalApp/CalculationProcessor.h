@@ -60,6 +60,9 @@ private:
 
 	void PreparePoints();
 
+	void PrepareRGBVectors();
+
+
 	void SerializeResult(std::string fileName);
 
 	// single thread
@@ -79,6 +82,8 @@ public:
 	Algorithm* m_algo = nullptr;
 	Normalization* m_norm = nullptr;
 	ColorPalette* m_color = nullptr;
+
+	bool writingResults = false;
 
 	DLL_EXPORT CalculationProcessor(Algorithm* algo, Normalization* m_norm, ColorPalette* color, int threads = 0);
 

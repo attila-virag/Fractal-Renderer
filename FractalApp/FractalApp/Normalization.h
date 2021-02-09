@@ -32,9 +32,9 @@ class Normalization {
 
 public:
 
-	Normalization(ParameterToNormalize p, NormalizationMethod m) { param = p; method = m; }
+	DLL_EXPORT Normalization(ParameterToNormalize p, NormalizationMethod m) { param = p; method = m; }
 
-	virtual ~Normalization();
+	virtual DLL_EXPORT ~Normalization() {};
 
 	double DLL_EXPORT GetNormalization(Result* r);
 	void DLL_EXPORT CollectMinMaxData(Result* r);

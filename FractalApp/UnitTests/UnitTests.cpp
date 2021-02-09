@@ -8,6 +8,8 @@
 #include "CalculationProcessor.h"
 #include <list>
 
+#include <Windows.h>
+
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -55,13 +57,15 @@ namespace UnitTests
 
 		TEST_METHOD(TestCreatePaletterBitmap)
 		{
-			auto pZoom = new Zoom(0, 0, 1, 1500);
+			auto pZoom = new Zoom(0, 0, 1, 500);
 			auto pColor = new ColorPalette();
-			auto pNorm = new Normalization(ParameterToNormalize::Int1, NormalizationMethod::SqrtSmoothing);
+			auto pNorm = new Normalization(ParameterToNormalize::double1, NormalizationMethod::BasicNormalization);
 			pColor->GenerateRandomColorPalette();
 			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::ShowColorPalette, pZoom);
 			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
 			pProc->CalculatePoints("paletteTest");
+			//wait until we finish writing
+			Sleep(5000);
 			pProc->LoadResultFromFile("paletteTest");
 			pProc->CreatePicture("paletteTestPicture");
 		}
@@ -198,12 +202,11 @@ namespace UnitTests
 			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
 
 			pProc->CalculatePoints("testGenerateMandelbrotResults");
-
 			
 		}
 
 		// this assumes we generateda file above 
-		TEST_METHOD(TestLoadResultsFromFile)
+		TEST_METHOD(TestLoadMandelbrotResultsFromFile)
 		{
 			auto pZoom = new Zoom();
 			auto pColor = new ColorPalette();
@@ -214,7 +217,38 @@ namespace UnitTests
 			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
 			pProc->LoadResultFromFile("testGenerateMandelbrotResults");
 
-			pProc->CreatePicture("testpicture");
+			pProc->CreatePicture("testMandelbrotpicture");
+		}
+
+
+		TEST_METHOD(TestGeneratePolynomialResults)
+		{
+			auto pZoom = new Zoom(0, 0, 7, 3000);
+			auto pColor = new ColorPalette();
+			auto pNorm = new Normalization(ParameterToNormalize::double1, NormalizationMethod::BasicNormalization);
+			pColor->GenerateRandomColorPalette();
+			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::Polynomial, pZoom);
+
+			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
+
+			pProc->CalculatePoints("testGeneratePolyResults");
+			while (pProc->writingResults) {
+				Sleep(100);
+			}
+		}
+
+		TEST_METHOD(TestLoadPolyResultsFromFile)
+		{
+			auto pZoom = new Zoom();
+			auto pColor = new ColorPalette();
+			pColor->GenerateRandomColorPalette();
+			auto pNorm = new Normalization(ParameterToNormalize::double1, NormalizationMethod::BasicNormalization);
+			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::Polynomial, pZoom);
+
+			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
+			pProc->LoadResultFromFile("testGeneratePolyResults");
+
+			pProc->CreatePicture("testPolypicture");
 		}
 	};
 }

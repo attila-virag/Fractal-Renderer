@@ -69,6 +69,9 @@
     <ClInclude Include="Normalization.h">
       <Filter>Header Files\Normalization</Filter>
     </ClInclude>
+    <ClInclude Include="PolynomialAlgorithm.h">
+      <Filter>Header Files\Algorithms</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
