@@ -18,8 +18,9 @@ public:
     double y_point = m_zoom->y_min + pt->y_pixel * m_zoom->y_increment;
 
     // apply two variable function to get z-value
-    double z = pow(x_point,2)*sin(y_point);
-    
+    //double z = pow(x_point,2)*sin(y_point);
+    double z = cos(x_point) - sin(y_point);
+
     pt->active = true;
     pt->double1 = z;
 

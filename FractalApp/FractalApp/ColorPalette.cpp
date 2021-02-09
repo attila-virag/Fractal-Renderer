@@ -7,6 +7,44 @@
 using std::cout;
 
 
+void ColorPalette::LinearInterpolateEx(double magnitude, int& rValue, int& gValue, int& bValue)
+{
+	if (magnitude > 1) magnitude = 1;
+	if (magnitude < 0) magnitude = 0;
+
+	if (cyclicColors) {
+		if (magnitude > 0.5) magnitude = 1 - magnitude; // "reverse" values greater than 5 to make palette cyclic
+	}
+
+	double increment = 1 / (double)numberOfColors;
+
+	// we figure out between which 2 colors of our palette we want to interpolate depending on where the magnitude falls on 0-1
+	int color2 = 1;
+	while (increment * color2 < magnitude) {
+		color2++;
+	}
+	// at this point we have to have found the color region
+	// now we use our linear interpolate formula
+
+	int color1 = color2 - 1;
+
+	double xa = increment * color1;
+	double xb = increment * color2;
+	double slope = 0;
+
+	double redValue, greenValue, blueValue = 0;
+
+	slope = (magnitude - xa) / (xb - xa);
+
+	redValue = Rvalues[color1] + ((double)Rvalues[color2] - (double)Rvalues[color1]) * slope;
+	greenValue = Gvalues[color1] + ((double)Gvalues[color2] - (double)Gvalues[color1]) * slope;
+	blueValue = Bvalues[color1] + ((double)Bvalues[color2] - (double)Bvalues[color1]) * slope;
+
+	rValue = static_cast<int>(redValue);
+	gValue = static_cast<int>(greenValue);
+	bValue = static_cast<int>(blueValue);
+}
+
 void ColorPalette::LinearInterpolate(double magnitude, int & rValue, int & gValue, int & bValue)
 {
 	// make cyclic colors i.e after .5 everything repeats backwards
@@ -99,22 +137,24 @@ bool ColorPalette::SavePaletteToFile(std::string fileName)
 
 	if (outFile.is_open()) {
 
+		outFile << "Number of Colors: " << std::endl;
+		outFile << numberOfColors << std::endl;
 
 		outFile << "Red Values: " << std::endl;
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < numberOfColors; i++) {
 			outFile << Rvalues[i] << std::endl;
 		}
 
 		outFile << "Green Values: " << std::endl;
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < numberOfColors; i++) {
 			outFile << Gvalues[i] << std::endl;
 		}
 
 		outFile << "Blue Values: " << std::endl;
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < numberOfColors; i++) {
 			outFile << Bvalues[i] << std::endl;
 		}
 
@@ -141,22 +181,26 @@ bool ColorPalette::LoadPaletteFromFile(std::string fileName)
 	if (inFile.is_open()) {
 		
 		getline(inFile, line);
+		inFile >> numberOfColors;
 
-		for (int i = 0; i < 5; i++) {
+		getline(inFile, line);
+		getline(inFile, line);
+
+		for (int i = 0; i < numberOfColors; i++) {
 			inFile >> Rvalues[i];
 		}
 
 		getline(inFile, line);
 		getline(inFile, line);
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < numberOfColors; i++) {
 			inFile >> Gvalues[i];
 		}
 
 		getline(inFile, line);
 		getline(inFile, line);
 		
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < numberOfColors; i++) {
 			inFile >> Bvalues[i];
 		}
 		
@@ -168,9 +212,9 @@ bool ColorPalette::LoadPaletteFromFile(std::string fileName)
 
 void ColorPalette::GenerateRandomColorPalette()
 {
-	for (int i = 0; i < 5; i++) {
-		Rvalues[i] = GetRandomColor();
-		Gvalues[i] = GetRandomColor();
-		Bvalues[i] = GetRandomColor();
+	for (int i = 0; i < numberOfColors; i++) {
+		Rvalues.push_back(GetRandomColor());
+		Gvalues.push_back(GetRandomColor());
+		Bvalues.push_back(GetRandomColor());
 	}
 }

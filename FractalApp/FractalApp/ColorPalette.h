@@ -15,9 +15,16 @@ using std::vector;
 
 class  ColorPalette {
 private:
-	array<int, 5> Rvalues;
-	array<int, 5> Gvalues;
-	array<int, 5> Bvalues;
+	//array<int, 5> Rvalues;
+	//array<int, 5> Gvalues;
+	//array<int, 5> Bvalues;
+
+	vector<int> Rvalues;
+	vector<int> Gvalues;
+	vector<int> Bvalues;
+
+	int numberOfColors;
+	bool cyclicColors;
 
 	std::random_device rd;
 
@@ -47,20 +54,24 @@ private:
 	}
 
 	void LinearInterpolate(double magnitude, int &redValue, int& greenValue, int& blueValue);
+	void LinearInterpolateEx(double magnitude, int& redValue, int& greenValue, int& blueValue);
 
 	int GetRandomColor(); // returns value between 0 -255
 
 public:
 
-	DLL_EXPORT ColorPalette() {
-		SetDefaultPalette();
+	DLL_EXPORT ColorPalette(int numberOfColors = 5, bool useCyclicColors = true) {
+		this->numberOfColors = numberOfColors;
+		cyclicColors = useCyclicColors;
+		//SetDefaultPalette();
+		GenerateRandomColorPalette();
 	}
 	//ColorPalette(ColorPalette &orig){}
 
 	void DLL_EXPORT EnterPalette(vector<int> red, vector<int> green, vector<int> blue);
 
 	void DLL_EXPORT GetColor(double magnitude, int &redValue, int &greenValue, int &blueValue) {
-		LinearInterpolate(magnitude, redValue, greenValue, blueValue);
+		LinearInterpolateEx(magnitude, redValue, greenValue, blueValue);
 	}
 
 	bool DLL_EXPORT SavePaletteToFile(std::string fileName);

@@ -46,7 +46,7 @@ namespace UnitTests
 		TEST_METHOD(TestCreateRandomPaletteAndSave)
 		{
 			Zoom zoom;
-			ColorPalette color;
+			ColorPalette color(20,false);
 
 			color.GenerateRandomColorPalette();
 
@@ -58,14 +58,16 @@ namespace UnitTests
 		TEST_METHOD(TestCreatePaletterBitmap)
 		{
 			auto pZoom = new Zoom(0, 0, 1, 500);
-			auto pColor = new ColorPalette();
+			auto pColor = new ColorPalette(20,false);
 			auto pNorm = new Normalization(ParameterToNormalize::double1, NormalizationMethod::BasicNormalization);
 			pColor->GenerateRandomColorPalette();
 			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::ShowColorPalette, pZoom);
 			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
 			pProc->CalculatePoints("paletteTest");
 			//wait until we finish writing
-			Sleep(5000);
+			while (pProc->writingResults) {
+				Sleep(100);
+			}
 			pProc->LoadResultFromFile("paletteTest");
 			pProc->CreatePicture("paletteTestPicture");
 		}
@@ -209,7 +211,7 @@ namespace UnitTests
 		TEST_METHOD(TestLoadMandelbrotResultsFromFile)
 		{
 			auto pZoom = new Zoom();
-			auto pColor = new ColorPalette();
+			auto pColor = new ColorPalette(30);
 			pColor->GenerateRandomColorPalette();
 			auto pNorm = new Normalization(ParameterToNormalize::Int1, NormalizationMethod::SqrtSmoothing);
 			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::Mandelbrot, pZoom);
@@ -240,7 +242,7 @@ namespace UnitTests
 		TEST_METHOD(TestLoadPolyResultsFromFile)
 		{
 			auto pZoom = new Zoom();
-			auto pColor = new ColorPalette();
+			auto pColor = new ColorPalette(50, false);
 			pColor->GenerateRandomColorPalette();
 			auto pNorm = new Normalization(ParameterToNormalize::double1, NormalizationMethod::BasicNormalization);
 			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::Polynomial, pZoom);
