@@ -27,6 +27,8 @@ public:
 
 	bool WriteBitmap(const char* filename);
 
+	FILE* WriteBitmapToBuffer(const char* filename);
+
 	bool WriteTestBitmap();
 
 

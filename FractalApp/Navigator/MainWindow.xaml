@@ -1,0 +1,34 @@
+﻿<Window x:Class="Navigator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Navigator"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="860" Width="520" ResizeMode="NoResize">
+    <Grid Margin="0,0,0,0" Height="860" Width="520" VerticalAlignment="Top">
+
+        <!-- Image loaded is always default.bmp-->
+        <Image Name="defaultImage" Margin="0" VerticalAlignment="Top"/>
+        <Border BorderBrush="Black" BorderThickness="3" HorizontalAlignment="Left" Height="520" Width="505" VerticalAlignment="Top"  Margin="0,0,0,0"/>
+        <WrapPanel Height="150" Width="150"  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,520,0,0">
+            <Button Content="+" FontSize="30" Width="50" Height="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Click="Click_Plus"/>
+            <Button FontFamily="Marlett" FontSize="20" Content="5" Width="50" Height="50" Click="Click_Up"/>
+            <Button Content="-" FontSize="30" Width="50" Height="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Click="Click_Minus"/>
+            <Button FontFamily="Marlett" FontSize="20" Content="3" Width="50" Height="50" Click="Click_Left"/>
+            <Button FontFamily="Marlett" FontSize="20" Content="2" Width="50" Height="50" />
+            <Button FontFamily="Marlett" FontSize="20" Content="4" Width="50" Height="50" Click="Click_Right"/>
+            <Button Content="Set" FontSize="13" Width="50" Height="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Click="Click_Set"/>
+            <Button FontFamily="Marlett" FontSize="20" Content="6" Width="50" Height="50" Click="Click_Down"/>
+            <Button Content="Revert" FontSize="13" Width="50" Height="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Click="Click_Revert"/>
+        </WrapPanel>
+        <TextBox Name="x_text" IsReadOnly="True" HorizontalAlignment="Left" FontSize="15" Height="25" Margin="228,540,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="250"/>
+        <TextBox Name="y_text" IsReadOnly="True" HorizontalAlignment="Left" FontSize="15" Height="25" Margin="228,570,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="250"/>
+        <TextBox Name="scale_text" IsReadOnly="True" HorizontalAlignment="Left" FontSize="15" Height="25" Margin="228,600,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="250"/>
+        <TextBox Name="zoom_text" IsReadOnly="True" HorizontalAlignment="Left" FontSize="15" Height="25" Margin="228,630,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="250"/>
+        <TextBlock HorizontalAlignment="Left" Margin="212,545,0,0" TextWrapping="Wrap" Text="X" FontSize="15" FontWeight="ExtraBold" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="212,575,0,0" TextWrapping="Wrap" Text="Y" FontSize="15" FontWeight="ExtraBold" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="185,605,0,0" TextWrapping="Wrap" Text="Scale" FontSize="15" FontWeight="ExtraBold" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="185,635,0,0" TextWrapping="Wrap" Text="Zoom" FontSize="15" FontWeight="ExtraBold" VerticalAlignment="Top"/>
+    </Grid>
+</Window>
