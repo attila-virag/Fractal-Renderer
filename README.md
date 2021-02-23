@@ -13,7 +13,8 @@ generate images from.
 # Coloring
 
 Coloring is done using color interpolation. The general color function takes a value range 0-1 as input and returns and R,G,B value. The R,G,B values are taken from a pallette
-that can be generated or loaded from file. The palette can be either cyclic or one way. For a cyclic palette the color at 0 is the same as the color at 1.
+that can be generated or loaded from file. Specific R,G,B values are assigned along the 0-1 range and the rest is interpolated in between. The palette can be either cyclic 
+or one way. For a cyclic palette the color at 0 is the same as the color at 1.
 
 # Normalization
 
