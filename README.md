@@ -5,10 +5,10 @@
 This project evolved organically over many years and incrementally became more organized. I used to write fractal generating and rendering code on-and-off mainly using c++.
 At times what came out was legtimately presentable but often the images were just so so. The point really was to have some fun and try to code everything from scratch. 
 
-Since calculating a fractal is a computationally involved thing and could take a long time it soon became apparent to separate the data generation part from the rendering 
-and coloring parts. That way I can re-color the same data set without waiting to re-generate. This is the basic principle in this program: we have an exploratory preview 
-mode which generates a 500 by 500 image that is used to launch a data set calculation. The data set gets saved to file and can be loaded to overlay different color schemes and 
-generate images from.
+Since calculating a fractal is a computationally involved and could take a long time it soon became apparent to separate the data generation part from the rendering 
+and coloring parts. That way I can re-color the same data set without waiting to re-generate the same fractal calculation. This is the basic principle in this program: 
+we have an exploratory preview mode which generates a 500 by 500 image that is used to launch a data set calculation. The data set gets saved to file and can be loaded to 
+overlay different color schemes and generate images from.
 
 # Coloring
 
