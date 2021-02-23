@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-const std::string workingDirectory = "C:\\FractalAppData\\";
+const std::string workingDirectory = "F:\\FractalApp\\";
 
 #ifdef _WIN32
 #if defined(DLL_EXPORTS)

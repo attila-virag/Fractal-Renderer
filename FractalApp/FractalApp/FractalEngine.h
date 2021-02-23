@@ -5,7 +5,7 @@
 
 extern "C" {
 
-	bool DLL_EXPORT CreateFractalEngine(void ** instPtr);
+	bool DLL_EXPORT CreateFractalEngine(void** zoomPtr, void** colorPtr, void** normPtr, void** algoPtr);
 
 	bool DLL_EXPORT CleanUp(void ** instPtr);
 
@@ -19,19 +19,19 @@ extern "C" {
 
 	bool DLL_EXPORT Set_Pixels(void *instPtr, int pixels);
 
-	int DLL_EXPORT Get_Pixels(void* instPtr);
+	bool DLL_EXPORT Get_Pixels(void* instPtr, int& pixels);
 
 	bool DLL_EXPORT Set_X_Value(void *instPtr, double x_value);
 
-	double DLL_EXPORT Get_X_Value(void* instPtr);
+	bool DLL_EXPORT Get_X_Value(void* instPtr, double &x_value);
 
 	bool DLL_EXPORT Set_Y_Value(void *instPtr, double y_value);
 
-	double DLL_EXPORT Get_Y_Value(void* instPtr);
+	bool DLL_EXPORT Get_Y_Value(void* instPtr, double& y_value);
 
 	bool DLL_EXPORT Set_Zoom(void* instPtr, double zoom);
 
-	double DLL_EXPORT Get_Zoom(void* instPtr);
+	bool DLL_EXPORT Get_Zoom(void* instPtr, double& zoom);
 
 	void DLL_EXPORT Reset_Zoom(void* instPtr);
 

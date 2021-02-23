@@ -114,7 +114,7 @@ void SetZoom(void* proc) {
 	int option = 1;
 	while (option != 10) {
 
-		x_center = Get_X_Value(proc);
+	/*	x_center = Get_X_Value(proc);
 		y_center = Get_Y_Value(proc);
 		zoom = Get_Zoom(proc);
 		pixels = Get_Pixels(proc);
@@ -178,8 +178,8 @@ void SetZoom(void* proc) {
 		{
 			Reset_Zoom(proc);
 			break;
-		}
-		}
+		}*/
+		//}
 	}
 }
 
@@ -263,33 +263,34 @@ void RenderImage(void * proc) {
 
 void Console() {
 
-	void* instPtr = nullptr;
+	//void* instPtr = nullptr;
+	//void* zoomPtr, void** colorPtr, void** normPtr, void** algoPtr
 
-	if (CreateFractalEngine(&instPtr)) {
+	//if (CreateFractalEngine(&instPtr)) {
 
-		while (true) {
+	//	while (true) {
 
-			int option = 0;
+	//		int option = 0;
 
-			cout << "Please enter an option: " << std::endl;
-			cout << "1 = Set algorithm , 2 = Set Palette, 3 = Set Zoom, 4 = Render Image, 10 = save and exit" << std::endl;
-			cout << "=>";
-			cin >> option;
+	//		cout << "Please enter an option: " << std::endl;
+	//		cout << "1 = Set algorithm , 2 = Set Palette, 3 = Set Zoom, 4 = Render Image, 10 = save and exit" << std::endl;
+	//		cout << "=>";
+	//		cin >> option;
 
-			switch (option) {
+	//		switch (option) {
 
-			case 1: SetAlgorithm(instPtr); continue;
-			case 2: SetPalette(instPtr); continue;
-			case 3: SetLocation(instPtr); continue;
-			case 4: RenderImage(instPtr); continue;
+	//		case 1: SetAlgorithm(instPtr); continue;
+	//		case 2: SetPalette(instPtr); continue;
+	//		case 3: SetLocation(instPtr); continue;
+	//		case 4: RenderImage(instPtr); continue;
 
-			case 10: {
-				CleanUp(&instPtr);
-				break;
-			}
-			default: continue;
-			}
+	//		case 10: {
+	//			CleanUp(&instPtr);
+	//			break;
+	//		}
+	//		default: continue;
+	//		}
 
-		}
-	}
+	//	}
+	//}
 }

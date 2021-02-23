@@ -151,7 +151,7 @@ FILE* BitmapWriter::WriteBitmapToBuffer(const char* filename)
 			}
 		}
 	}
-
+	return  outfile;
 }
 
 bool BitmapWriter::WriteBitmap(const char* filename)
@@ -277,10 +277,10 @@ bool BitmapWriter::WriteTestBitmap()
 
 }
 
-bool BitmapWriter::WriteTestBitmap()
-{
-	GetTestData();
-
-	return WriteBitmap("test.bmp");
-
-}
+//bool BitmapWriter::WriteTestBitmap()
+//{
+//	GetTestData();
+//
+//	return WriteBitmap("test.bmp");
+//
+//}

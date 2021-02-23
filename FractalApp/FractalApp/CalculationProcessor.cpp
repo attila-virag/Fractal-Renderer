@@ -162,7 +162,7 @@ void CalculationProcessor::SaveResults(std::string fileName)
 
 	std::ofstream outFile;
 
-	std::string filePath = workingDirectory + "results\\" + fileName+ ".result";
+	std::string filePath = workingDirectory + "data\\" + fileName+ ".result";
 
 	outFile.open(filePath, std::ios::out | std::ios::binary);
 
@@ -350,7 +350,7 @@ void CalculationProcessor::CreatePicture(std::string fileName)
 
 bool CalculationProcessor::LoadResultFromFile(std::string filename)
 {
-	std::string filePath = workingDirectory + "results\\" + filename + ".result";
+	std::string filePath = workingDirectory + "data\\" + filename + ".result";
 	std::ifstream inFile;
 
 	inFile.open(filePath, std::ios::in | std::ios::binary);

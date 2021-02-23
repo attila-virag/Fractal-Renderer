@@ -7,23 +7,25 @@
 #include "CalculationProcessor.h"
 
 extern "C" {
-	bool CreateFractalEngine(void** instPtr)
+
+	bool CreateFractalEngine(void** zoomPtr, void ** colorPtr, void ** normPtr, void** algoPtr)
 	{
+
+		auto pZoom = new Zoom();
+		auto pColor = new ColorPalette();
+		auto pNorm = new Normalization(ParameterToNormalize::Int1, NormalizationMethod::SqrtSmoothing);
+		auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::Mandelbrot, pZoom);
+
+		// load the default files
+		pZoom->LoadZoomDataFromFile("default");
+		pColor->LoadPaletteFromFile("default");
+
+		*zoomPtr = (void*)pZoom;
+		*colorPtr = (void*)pColor;
+		*normPtr = (void*)pNorm;
+		*algoPtr = (void*)pAlgo;
+
 		return true;
-		//auto pZoom = new Zoom();
-		//auto pColor = new ColorPalette();
-		//auto pAlgo = new Algorithm(pZoom, pColor);
-		//auto pProc = new  CalculationProcessor(pAlgo);
-
-		//// load the deafault files
-		//pZoom->LoadZoomDataFromFile("default");
-		//pColor->LoadPaletteFromFile("default");
-
-		//*instPtr = (void*)pProc;
-
-		//if (*instPtr == nullptr)
-		//	return false;
-		//else return true;
 	}
 
 	bool CleanUp(void** instPtr)
@@ -100,73 +102,86 @@ extern "C" {
 	bool Set_Pixels(void* instPtr, int pixels)
 	{
 		return true;
-		/*if (instPtr != nullptr) {
+		if (instPtr != nullptr) {
 
-			((CalculationProcessor*)instPtr)->m_algo->m_zoom->pixels = pixels;
+			((Zoom*)instPtr)->pixels = pixels;
+			((Zoom*)instPtr)->ResetZoom();
 
 			return true;
 		}
-		else return false;*/
+		else return false;
 	}
 
-	int Get_Pixels(void* instPtr)
+	bool Get_Pixels(void* instPtr, int& pixels)
 	{
-		return 0;
-			/*return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->pixels;*/
+		if (instPtr != nullptr) {
+			pixels = ((Zoom*)instPtr)->pixels;
+			return true;
+		}
+		else return false;
 	}
 
 	bool Set_X_Value(void* instPtr, double x_value)
 	{
-		return 0;
-		/*if (instPtr != nullptr) {
+		if (instPtr != nullptr) {
 
-			((CalculationProcessor*)instPtr)->m_algo->m_zoom->x_center = x_value;
+			((Zoom*)instPtr)->x_center = x_value;
+			((Zoom*)instPtr)->ResetZoom();
 
 			return true;
 		}
-		else return false;*/
+		else return false;
 	}
 
-	double Get_X_Value(void* instPtr)
+	bool Get_X_Value(void* instPtr, double& x_value)
 	{
-		return 0;
-			/*return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->x_center;*/
+		if (instPtr != nullptr) {
+			x_value = ((Zoom*)instPtr)->x_center;
+			return true;
+		}
+		else return false;
 	}
 
 	bool Set_Y_Value(void* instPtr, double y_value)
 	{
-		return true;
-		/*if (instPtr != nullptr) {
+		if (instPtr != nullptr) {
 
-			((CalculationProcessor*)instPtr)->m_algo->m_zoom->y_center = y_value;
+			((Zoom*)instPtr)->y_center = y_value;
+			((Zoom*)instPtr)->ResetZoom();
 
 			return true;
 		}
-		else return false;*/
+		else return false;
 	}
 
-	double Get_Y_Value(void* instPtr)
+	bool Get_Y_Value(void* instPtr, double& y_value)
 	{
-		return 0;
-			/*return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->y_center;*/
+		if (instPtr != nullptr) {
+			y_value = ((Zoom*)instPtr)->y_center;
+			return true;
+		}
+		else return false;
 	}
 
 	bool Set_Zoom(void* instPtr, double zoom)
 	{
-		return true;
-		/*if (instPtr != nullptr) {
+		if (instPtr != nullptr) {
 
-			((CalculationProcessor*)instPtr)->m_algo->m_zoom->zoom = zoom;
+			((Zoom*)instPtr)->zoom = zoom;
+			((Zoom*)instPtr)->ResetZoom();
 
 			return true;
 		}
-		return false;*/
+		else return false;
 	}
 
-	double Get_Zoom(void* instPtr)
+	bool Get_Zoom(void* instPtr, double& zoom)
 	{
-		return 0;
-			/*return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->zoom;*/
+		if (instPtr != nullptr) {
+			zoom = ((Zoom*)instPtr)->zoom;
+			return true;
+		}
+		else return false;
 	}
 
 	void DLL_EXPORT Reset_Zoom(void* instPtr)

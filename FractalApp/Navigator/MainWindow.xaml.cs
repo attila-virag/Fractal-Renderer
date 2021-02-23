@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CalculatorInterface;
 
 namespace Navigator
 {
@@ -25,15 +26,17 @@ namespace Navigator
     //string imagePath = "F:\\test\\testMandelbrotpicture.bmp";
     Uri uri = new System.Uri("F:\\test\\testMandelbrotpicture.bmp");
 
+    private ICalculatorInterface calculator  = new Calculator();
+
     private double display_x, display_y, display_scale;
-    private double x, y, scale;
+    private int display_pixels;
 
     private void SetCoordinates()
     {
-      x = display_x;
-      y = display_y;
-      scale = display_scale;
-
+      calculator.X = display_x;
+      calculator.Y = display_y;
+      calculator.Scale = display_scale;
+      calculator.Pixels = display_pixels;
       // should also call generate preview
     }
 
@@ -82,6 +85,18 @@ namespace Navigator
       get { return 1/display_scale; }   // get method
     }
 
+    public int Display_pixels
+    { 
+      get { return display_pixels; }   // get method
+      set
+      {
+        if (value != display_pixels)
+        {
+          display_pixels = value;
+        }
+      }
+    }
+
     public MainWindow()
     {
       InitializeComponent();
@@ -89,6 +104,7 @@ namespace Navigator
       Display_x = 1.1;
       Display_y = -.5;
       Display_scale = 1;
+      Display_pixels = 500;
       SetCoordinates();
     }
 
@@ -131,9 +147,9 @@ namespace Navigator
     private void Click_Revert(object sender, RoutedEventArgs e)
     {
 
-      Display_x = x;
-      Display_y = y;
-      Display_scale = scale;
+      Display_x = calculator.X;
+      Display_y = calculator.Y;
+      Display_scale = calculator.Scale;
     }
 
     private void Click_Set(object sender, RoutedEventArgs e)
