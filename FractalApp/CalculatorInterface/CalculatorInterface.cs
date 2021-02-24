@@ -20,6 +20,7 @@ namespace CalculatorInterface
     int Pixels { get; set; }
 
     //static Create();;// Create();
+    void CreateDefault();
 
   }
 }

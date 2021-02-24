@@ -179,7 +179,11 @@ bool ColorPalette::LoadPaletteFromFile(std::string fileName)
 	std::string line;
 
 	if (inFile.is_open()) {
-		
+
+		Rvalues.clear();
+		Gvalues.clear();
+		Bvalues.clear();
+
 		getline(inFile, line);
 		inFile >> numberOfColors;
 
@@ -187,21 +191,27 @@ bool ColorPalette::LoadPaletteFromFile(std::string fileName)
 		getline(inFile, line);
 
 		for (int i = 0; i < numberOfColors; i++) {
-			inFile >> Rvalues[i];
+			int val;
+			inFile >> val;
+			Rvalues.push_back(val);
 		}
 
 		getline(inFile, line);
 		getline(inFile, line);
 
 		for (int i = 0; i < numberOfColors; i++) {
-			inFile >> Gvalues[i];
+			int val;
+			inFile >> val;
+			Gvalues.push_back(val);
 		}
 
 		getline(inFile, line);
 		getline(inFile, line);
 		
 		for (int i = 0; i < numberOfColors; i++) {
-			inFile >> Bvalues[i];
+			int val;
+			inFile >> val;
+			Bvalues.push_back(val);
 		}
 		
 		inFile.close();

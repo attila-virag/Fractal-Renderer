@@ -225,7 +225,7 @@ void RenderImage(void * proc) {
 		switch (option) {
 		case 1: 
 		{
-			GeneratePreview(proc, name.c_str());
+			//GeneratePreview(proc, name.c_str());
 			break;
 		}
 		case 2: 

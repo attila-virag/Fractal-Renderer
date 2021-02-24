@@ -17,6 +17,15 @@ namespace UnitTests
 {
 	TEST_CLASS(UnitTests)
 	{
+
+		bool CompareAbs(double d1, double d2, double tol)
+		{
+			double _d1 = abs(d1);
+			double _d2 = abs(d2);
+
+			return abs(_d1 - _d2) < tol;
+		}
+
 	public:
 		
 		TEST_METHOD(TestRunColorInterpolate)
@@ -74,7 +83,12 @@ namespace UnitTests
 
 		TEST_METHOD(TestLoadSaveLocation)
 		{
-			Zoom zoom(-0.773774,-.11766,0.001,1500);
+			double x = -0.773774;
+			double y = -.11766;
+			double z = 0.001;
+			int p = 500;
+
+			Zoom zoom(x,y,z,p);
 			
 			Assert::IsTrue(zoom.SaveZoomDataToFile("test"));
 
@@ -84,9 +98,11 @@ namespace UnitTests
 
 			Assert::IsTrue(zoom.LoadZoomDataFromFile("test"));
 
-			Assert::AreEqual((double)1, zoom.x_center);
-			Assert::AreEqual((double)1, zoom.y_center);
-			Assert::AreEqual((double)1, zoom.zoom);
+			double tol = 0.000000001;
+
+			Assert::IsTrue(CompareAbs(x, zoom.x_center, tol));
+			Assert::IsTrue(CompareAbs(y, zoom.y_center, tol));
+			Assert::IsTrue(CompareAbs(z, zoom.zoom, tol));
 		}
 
 		TEST_METHOD(TestSerializeResult)

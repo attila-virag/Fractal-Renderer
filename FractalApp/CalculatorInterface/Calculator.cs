@@ -26,26 +26,39 @@ namespace CalculatorInterface
     public static extern bool Get_Zoom(IntPtr zoomPtr, ref double zoom);
     [DllImport(installDir + "FractalApp.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern bool Get_Pixels(IntPtr zoomPtr, ref int pixels);
+    [DllImport(installDir + "FractalApp.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool LoadLocationFromFile(IntPtr zoomPtr,  char[] chars);
+    [DllImport(installDir + "FractalApp.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool SaveLocationToFile(IntPtr zoomPtr,  char[] chars);
+    [DllImport(installDir + "FractalApp.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool GeneratePreview(IntPtr zoomPtr, IntPtr palettePtr, IntPtr normPtr, IntPtr algoPtr);
 
-
-    public double X { get { double x_value = 0; Get_X_Value(zoomPtr, ref x_value); return x_value; } set { Set_X_Value( zoomPtr, ref value); } }
-    public double Y { get { double y_value = 0; Get_Y_Value(zoomPtr, ref y_value); return y_value; } set { Set_Y_Value( zoomPtr, ref value); } }
-    public double Scale { get { double scale = 0; Get_Zoom(zoomPtr, ref scale); return scale; } set { Set_Zoom(zoomPtr, ref value); } }
-    public int Pixels { get { int pixels = 0; Get_Pixels(zoomPtr, ref pixels); return pixels; } set { Set_Pixels( zoomPtr, ref value); } }
+    public double X { get { double x_value = 0; Get_X_Value(zoomPtr, ref x_value); return x_value; } set { Set_X_Value( zoomPtr, ref value); SaveLocationToFile(zoomPtr, str.ToCharArray()); } }
+    public double Y { get { double y_value = 0; Get_Y_Value(zoomPtr, ref y_value); return y_value; } set { Set_Y_Value( zoomPtr, ref value);  SaveLocationToFile(zoomPtr, str.ToCharArray()); } }
+    public double Scale { get { double scale = 0; Get_Zoom(zoomPtr, ref scale); return scale; } set { Set_Zoom(zoomPtr, ref value);  SaveLocationToFile(zoomPtr, str.ToCharArray()); } }
+    public int Pixels { get { int pixels = 0; Get_Pixels(zoomPtr, ref pixels); return pixels; } set { Set_Pixels( zoomPtr, ref value); SaveLocationToFile(zoomPtr, str.ToCharArray()); } }
 
     private IntPtr zoomPtr = IntPtr.Zero;
     private IntPtr palettePtr = IntPtr.Zero;
     private IntPtr normPtr = IntPtr.Zero;
     private IntPtr algoPtr = IntPtr.Zero;
 
+    const String str = "default";
+
     public Calculator()
     {
       Initialize();
     }
 
+    public void CreateDefault()
+    {
+      GeneratePreview( zoomPtr, palettePtr, normPtr, algoPtr);
+    }
+
     private void Initialize()
     {
       CreateFractalEngine(ref zoomPtr,ref palettePtr,ref normPtr,ref algoPtr);
+
     }
   }
 }

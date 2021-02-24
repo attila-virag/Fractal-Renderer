@@ -83,7 +83,7 @@ public:
 	Normalization* m_norm = nullptr;
 	ColorPalette* m_color = nullptr;
 
-	bool writingResults = false;
+	std::atomic_bool writingResults = false;
 
 	DLL_EXPORT CalculationProcessor(Algorithm* algo, Normalization* m_norm, ColorPalette* color, int threads = 0);
 

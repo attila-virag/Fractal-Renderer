@@ -108,7 +108,7 @@ void CalculationProcessor::ReportProgress()
 #ifdef _DEBUG
 		OutputDebugStringA(ss.str().c_str());
 #endif
-		Sleep(2000);
+		Sleep(20);
 	}
 
 	while (!IsResultQueueEmpty()) {
@@ -122,7 +122,7 @@ void CalculationProcessor::ReportProgress()
 #ifdef _DEBUG
 		OutputDebugStringA(ss.str().c_str());
 #endif
-		Sleep(2000);
+		Sleep(20);
 
 	}
 	// we just return once done
@@ -158,7 +158,7 @@ void CalculationProcessor::SaveResult(std::mutex* mu, std::ofstream* outFile)
 void CalculationProcessor::SaveResults(std::string fileName)
 {
 	resultsWritten = 0;
-	writingResults = true;
+	writingResults.store(true);
 
 	std::ofstream outFile;
 
@@ -186,7 +186,7 @@ void CalculationProcessor::SaveResults(std::string fileName)
 	for_each(threadList.begin(), threadList.end(), std::mem_fn(&std::thread::join));
 
 	outFile.close();
-	writingResults = false;
+	writingResults.store(false);
 }
 
 // the result queue can be processed as soon as there 
@@ -316,7 +316,7 @@ CalculationProcessor::CalculationProcessor(Algorithm* algo, Normalization* norm,
 #ifdef SINGLE_THREAD
 	m_concurrency = 1;
 #else
-	auto concurrency = std::thread::hardware_concurrency();
+	auto concurrency = std::thread::hardware_concurrency()*2;
 	if (concurrency > 0 && threads == 0) {
 		m_concurrency = concurrency;
 	}

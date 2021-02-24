@@ -5,6 +5,8 @@
 #include "Zoom.h"
 #include "FractalAlgorithm.h"
 #include "CalculationProcessor.h"
+#include <Windows.h>
+
 
 extern "C" {
 
@@ -191,22 +193,20 @@ extern "C" {
 
 	bool LoadLocationFromFile(void* instPtr, const char* filename)
 	{
-		return true;
-		/*if (instPtr != nullptr) {
-
-			return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->LoadZoomDataFromFile(filename);
+		if (instPtr != nullptr) {
+			((Zoom*)instPtr)->LoadZoomDataFromFile(filename);
+			return true;
 		}
-		return false;*/
+		else return false;
 	}
 
 	bool SaveLocationToFile(void* instPtr, const char* filename)
 	{
-		return true;
-		/*if (instPtr != nullptr) {
-
-			return ((CalculationProcessor*)instPtr)->m_algo->m_zoom->SaveZoomDataToFile(filename);
+		if (instPtr != nullptr) {
+			((Zoom*)instPtr)->SaveZoomDataToFile(filename);
+			return true;
 		}
-		return false;*/
+		else return false;
 	}
 
 	bool LoadColorPaletteFromFile(void* instPtr, const char* filename)
@@ -256,8 +256,10 @@ extern "C" {
 		return false;
 	}
 
-	bool GeneratePreview(void* instPtr, const char* filename)
+	bool GeneratePreview(void* zoomPtr, void* colorPtr, void* normPtr, void* algoPtr)
 	{
+		//DLL_EXPORT CalculationProcessor(Algorithm* algo, Normalization* m_norm, ColorPalette* color, int threads = 0);
+		CalculationProcessor proc((Algorithm*)algoPtr, (Normalization*)normPtr, (ColorPalette*)colorPtr);
 		//auto proc = ((CalculationProcessor*)instPtr);
 
 		//auto pixels = proc->m_algo->m_zoom->pixels;
@@ -266,7 +268,17 @@ extern "C" {
 
 		//proc->m_algo->m_zoom->ResetZoom();
 
-		//proc->CreatePicture(std::string(filename) + "_preview");
+		proc.CalculatePoints("default");
+
+		// this busy wait to be fixed
+		while (proc.writingResults) {
+			Sleep(100);
+		}
+
+		// this should be not necesary to load from file here
+		proc.LoadResultFromFile("default");
+
+		proc.CreatePicture("default");
 
 		//proc->m_algo->m_zoom->pixels = pixels;
 

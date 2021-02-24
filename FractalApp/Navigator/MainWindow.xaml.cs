@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Cache;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,12 +25,14 @@ namespace Navigator
   {
 
     //string imagePath = "F:\\test\\testMandelbrotpicture.bmp";
-    Uri uri = new System.Uri("F:\\test\\testMandelbrotpicture.bmp");
+    Uri uri = new System.Uri("F:\\FractalApp\\images\\default.bmp");
 
     private ICalculatorInterface calculator  = new Calculator();
 
     private double display_x, display_y, display_scale;
     private int display_pixels;
+
+    BitmapImage defaultBi;
 
     private void SetCoordinates()
     {
@@ -38,7 +41,18 @@ namespace Navigator
       calculator.Scale = display_scale;
       calculator.Pixels = display_pixels;
       // should also call generate preview
+      calculator.CreateDefault();
+      defaultBi = new BitmapImage();
+      defaultBi.BeginInit();
+      defaultBi.CacheOption = BitmapCacheOption.None;
+      defaultBi.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
+      defaultBi.CacheOption = BitmapCacheOption.OnLoad;
+      defaultBi.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+      defaultBi.UriSource = new Uri(@"F:/FractalApp/images/default.bmp", UriKind.Absolute);
+      defaultBi.EndInit();
+      defaultImage.Source = defaultBi;
     }
+
 
     public double Display_x   // property
     {
@@ -100,11 +114,18 @@ namespace Navigator
     public MainWindow()
     {
       InitializeComponent();
-      defaultImage.Source = new BitmapImage(uri);
-      Display_x = 1.1;
-      Display_y = -.5;
-      Display_scale = 1;
-      Display_pixels = 500;
+      defaultBi = new BitmapImage();
+      defaultBi.BeginInit();
+      defaultBi.CacheOption = BitmapCacheOption.None;
+      defaultBi.UriCachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache);
+      defaultBi.CacheOption = BitmapCacheOption.OnLoad;
+      defaultBi.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+      defaultBi.UriSource = new Uri(@"F:/FractalApp/images/default.bmp", UriKind.Absolute);
+      defaultBi.EndInit();
+      Display_x = calculator.X;
+      Display_y = calculator.Y;
+      Display_scale = calculator.Scale;
+      Display_pixels = calculator.Pixels;
       SetCoordinates();
     }
 
@@ -155,9 +176,13 @@ namespace Navigator
     private void Click_Set(object sender, RoutedEventArgs e)
     {
       SetCoordinates();
-      defaultImage.Source = new BitmapImage(uri);
       // calling worker thread to do a job
       // post a message on the worker thread queue
+    }
+
+    private void Click_Load(object sender, RoutedEventArgs e)
+    {
+
     }
   }
 }

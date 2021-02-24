@@ -94,7 +94,7 @@ public:
 	{
 		std::ifstream inFile;
 
-		std::string filePath = workingDirectory + "locations\\"+ fileName + ".txt";
+		std::string filePath = workingDirectory + "locations\\"+ fileName + ".bin";
 
 		inFile.open(filePath, std::ios::in | std::ios::binary);
 

@@ -45,7 +45,7 @@ extern "C" {
 
 	bool DLL_EXPORT SaveColorPalette(void * instPtr, const char* filename);
 
-	bool DLL_EXPORT GeneratePreview(void* instPtr, const char* filename);
+	bool DLL_EXPORT GeneratePreview(void* zoomPtr, void* colorPtr, void* normPtr, void* algoPtr);
 
 	bool DLL_EXPORT GenerateImage(void* instPtr, const char* filename);
 
