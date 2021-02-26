@@ -23,7 +23,7 @@ enum class ColorScheme {
 
 class MandelbrotSet : public Algorithm {
 
-	void ShowColorPalette(Result* pt);
+	void ShowColorPalette(Point* pt);
 
 	//void MandelBrotSet(Result * pt);
 
@@ -56,11 +56,11 @@ public:
 	AlgorithmType algoType = AlgorithmType::Mandelbrot;
 	ColorScheme colorScheme = ColorScheme::IterationCount;
 
-	DLL_EXPORT MandelbrotSet(Zoom* zoom) :  Algorithm(zoom) {};
+	DLL_EXPORT MandelbrotSet(Location* zoom) :  Algorithm(zoom) {};
 	virtual ~MandelbrotSet(){}
 
 	// this method will run in multiple threads
-	void DLL_EXPORT CalculatePoint(Result* pt);
+	void DLL_EXPORT CalculatePoint(Point* pt);
 
 	// for each point normalizes the magnitude value based on whatever smoothing methodology applied
 	//void DLL_EXPORT GetNormalization(Result * pt);

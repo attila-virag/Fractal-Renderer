@@ -9,16 +9,16 @@
 #include "ColorPalette.h"
 #include "BitmapWriter.h"
 
-#include <queue>
+#include "PointQueue.h"
 #include <vector>
 #include <memory>
 #include <mutex>
 #include <chrono>
 
-using std::queue;
 using std::vector;
 using std::unique_ptr;
 using std::mutex;
+
 
 class  CalculationProcessor {
 private:
@@ -27,12 +27,15 @@ private:
 	vector<vector<int>> m_blueData;
 	vector<vector<int>> m_greenData;
 
-	mutex _mu1;
-	mutex _mu2;
+	//PointQueue pointQueue;
+	//queue <unique_ptr<Point>> resultQueue;
 
-	queue < unique_ptr<Result>> pointQueue;
+	Location m_lastCalculated;
 
-	queue <unique_ptr<Result>> resultQueue;
+	PointQueue toBeCalculated; // to be calculated
+	PointQueue toBeWritten; // writes the data set to file
+	PointQueue getRGBValues; // this queue is used to generate RGB values based on the results
+	PointQueue lastResults; // we hold on to these after we are done with a generation sequence
 
 	long long startTime = 0;
 	int resultsWritten = 0;
@@ -40,18 +43,18 @@ private:
 	unsigned int m_concurrency{ 2 };
 
 	// passes a point in queue to thread
-	unique_ptr<Result> GetNextPoint();
+	//unique_ptr<Point> GetNextPoint();
 
-	unique_ptr<Result> GetNextResult();
+	//unique_ptr<Point> GetNextResult();
 
-	void AddPointToQueue(int x, int y);
+	//void AddPointToQueue(int x, int y);
 
 	//queue.empty() is not thread safe
-	bool IsQueueEmpty();
+	//bool IsQueueEmpty();
 
-	int GetQueueSize();
+	//int GetQueueSize();
 
-	bool IsResultQueueEmpty();
+	//bool IsResultQueueEmpty();
 
 	// each thread will run this method
 	void CalculatePoint(int threadId);
@@ -76,6 +79,8 @@ private:
 
 	void SaveResult(std::mutex* mu, std::ofstream* outFile);
 
+	void FindChanges();
+
 public:
 
 	//FractalFunction m_func = nullptr;
@@ -84,15 +89,24 @@ public:
 	ColorPalette* m_color = nullptr;
 
 	std::atomic_bool writingResults = false;
+	std::atomic_int pointsToBeCalculated;
+	std::atomic_int pointsToBeRecorded;
+	std::atomic_int pixelsWritten;
 
 	DLL_EXPORT CalculationProcessor(Algorithm* algo, Normalization* m_norm, ColorPalette* color, int threads = 0);
 
 	DLL_EXPORT ~CalculationProcessor();
 
-	bool DLL_EXPORT CalculatePoints(const std::string& fileName);
+	bool DLL_EXPORT GenerateImage(std::string fileName);
 
-	bool DLL_EXPORT LoadResultFromFile(std::string filename);
+	//bool DLL_EXPORT CalculatePoints(const std::string& fileName);
+
+	bool DLL_EXPORT LoadPointsFromFile(std::string filename);
+
+	//bool DLL_EXPORT LoadDefaultFromFile();
 
 	void DLL_EXPORT CreatePicture(std::string fileName);
+
+
 
 };

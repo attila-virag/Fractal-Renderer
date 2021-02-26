@@ -2,17 +2,17 @@
 #include "Normalization.h"
 #include <complex>
 
-double Normalization::BasicNormalization(Result* r)
+double Normalization::BasicNormalization(Point* r)
 {
   return (GetParameter(r) - valueMin) / (valueMax - (double)valueMin);
 }
 
-double Normalization::SqrtSmoothing(Result* r)
+double Normalization::SqrtSmoothing(Point* r)
 {
   return sqrt(sqrt(sqrt(BasicNormalization(r))));
 }
 
-double Normalization::GetNormalization(Result* r)
+double Normalization::GetNormalization(Point* r)
 {
   switch (method) {
   case NormalizationMethod::BasicNormalization : return BasicNormalization(r);
@@ -21,7 +21,7 @@ double Normalization::GetNormalization(Result* r)
   }
 }
 
-double Normalization::GetParameter(Result* r)
+double Normalization::GetParameter(Point* r)
 {
   switch (param) {
   case ParameterToNormalize::Int1: return (double)r->int1;
@@ -36,7 +36,7 @@ double Normalization::GetParameter(Result* r)
   }
 }
 
-void Normalization::CollectMinMaxData(Result* r)
+void Normalization::CollectMinMaxData(Point* r)
 {
   if (GetParameter(r) < this->valueMin) {
     this->valueMin = GetParameter(r);

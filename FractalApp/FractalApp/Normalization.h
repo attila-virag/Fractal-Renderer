@@ -22,13 +22,13 @@ class Normalization {
 	ParameterToNormalize param;
 	NormalizationMethod method;
 
-	double GetParameter(Result* r);
+	double GetParameter(Point* r);
 
 	double valueMin = 0;
 	double valueMax = 0;
 
-	double BasicNormalization(Result* r);
-	double SqrtSmoothing(Result* r);
+	double BasicNormalization(Point* r);
+	double SqrtSmoothing(Point* r);
 
 public:
 
@@ -36,6 +36,6 @@ public:
 
 	virtual DLL_EXPORT ~Normalization() {};
 
-	double DLL_EXPORT GetNormalization(Result* r);
-	void DLL_EXPORT CollectMinMaxData(Result* r);
+	double DLL_EXPORT GetNormalization(Point* r);
+	void DLL_EXPORT CollectMinMaxData(Point* r);
 };

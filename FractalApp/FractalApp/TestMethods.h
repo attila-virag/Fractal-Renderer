@@ -22,7 +22,7 @@ void TestRunColorInterpolate() {
 }
 
 void TestCreateRandomPaletteAndSave() {
-	Zoom zoom;
+	Location zoom;
 	ColorPalette color;
 
 	color.GenerateRandomColorPalette();
@@ -46,7 +46,7 @@ void TestLoadPaletteFromFile() {
 
 void TestCreatePaletterBitmap() {
 
-	Zoom zoom;
+	Location zoom;
 	ColorPalette color;
 	FractalAlgorithm alg(&zoom, &color);
 
@@ -59,11 +59,11 @@ void TestCreatePaletterBitmap() {
 }
 
 void TestCreateMandelBrot() {
-	Zoom zoom;
+	Location zoom;
 
 	//zoom.ResetZoom(-0.5, 0, 1.5, 1000);
 
-	zoom.ResetZoom(-1.7497219297, -0.000029016647, 0.001, 500);
+	zoom.ResetLocation(-1.7497219297, -0.000029016647, 0.001, 500);
 
 	ColorPalette color;
 	color.LoadPaletteFromFile("test");

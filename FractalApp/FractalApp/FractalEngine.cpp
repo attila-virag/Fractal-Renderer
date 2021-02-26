@@ -2,7 +2,7 @@
 #include "FractalEngine.h"
 
 #include "ColorPalette.h"
-#include "Zoom.h"
+#include "Location.h"
 #include "FractalAlgorithm.h"
 #include "CalculationProcessor.h"
 #include <Windows.h>
@@ -10,22 +10,27 @@
 
 extern "C" {
 
-	bool CreateFractalEngine(void** zoomPtr, void ** colorPtr, void ** normPtr, void** algoPtr)
+	bool CreateFractalEngine(void** zoomPtr, void ** colorPtr, void ** normPtr, void** algoPtr, void** calcPtr)
 	{
 
-		auto pZoom = new Zoom();
+		auto pZoom = new Location();
 		auto pColor = new ColorPalette();
 		auto pNorm = new Normalization(ParameterToNormalize::Int1, NormalizationMethod::SqrtSmoothing);
 		auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::Mandelbrot, pZoom);
 
 		// load the default files
-		pZoom->LoadZoomDataFromFile("default");
+		pZoom->LoadLocationDataFromFile("default");
 		pColor->LoadPaletteFromFile("default");
 
 		*zoomPtr = (void*)pZoom;
 		*colorPtr = (void*)pColor;
 		*normPtr = (void*)pNorm;
 		*algoPtr = (void*)pAlgo;
+
+		auto pProc = new CalculationProcessor(pAlgo, pNorm, pColor);
+
+		pProc->LoadPointsFromFile("default");
+		*calcPtr = (void*)pProc;
 
 		return true;
 	}
@@ -106,8 +111,8 @@ extern "C" {
 		return true;
 		if (instPtr != nullptr) {
 
-			((Zoom*)instPtr)->pixels = pixels;
-			((Zoom*)instPtr)->ResetZoom();
+			((Location*)instPtr)->pixels = pixels;
+			((Location*)instPtr)->ResetLocation();
 
 			return true;
 		}
@@ -117,7 +122,7 @@ extern "C" {
 	bool Get_Pixels(void* instPtr, int& pixels)
 	{
 		if (instPtr != nullptr) {
-			pixels = ((Zoom*)instPtr)->pixels;
+			pixels = ((Location*)instPtr)->pixels;
 			return true;
 		}
 		else return false;
@@ -127,8 +132,8 @@ extern "C" {
 	{
 		if (instPtr != nullptr) {
 
-			((Zoom*)instPtr)->x_center = x_value;
-			((Zoom*)instPtr)->ResetZoom();
+			((Location*)instPtr)->x_center = x_value;
+			((Location*)instPtr)->ResetLocation();
 
 			return true;
 		}
@@ -138,7 +143,7 @@ extern "C" {
 	bool Get_X_Value(void* instPtr, double& x_value)
 	{
 		if (instPtr != nullptr) {
-			x_value = ((Zoom*)instPtr)->x_center;
+			x_value = ((Location*)instPtr)->x_center;
 			return true;
 		}
 		else return false;
@@ -148,8 +153,8 @@ extern "C" {
 	{
 		if (instPtr != nullptr) {
 
-			((Zoom*)instPtr)->y_center = y_value;
-			((Zoom*)instPtr)->ResetZoom();
+			((Location*)instPtr)->y_center = y_value;
+			((Location*)instPtr)->ResetLocation();
 
 			return true;
 		}
@@ -159,7 +164,7 @@ extern "C" {
 	bool Get_Y_Value(void* instPtr, double& y_value)
 	{
 		if (instPtr != nullptr) {
-			y_value = ((Zoom*)instPtr)->y_center;
+			y_value = ((Location*)instPtr)->y_center;
 			return true;
 		}
 		else return false;
@@ -169,8 +174,8 @@ extern "C" {
 	{
 		if (instPtr != nullptr) {
 
-			((Zoom*)instPtr)->zoom = zoom;
-			((Zoom*)instPtr)->ResetZoom();
+			((Location*)instPtr)->zoom = zoom;
+			((Location*)instPtr)->ResetLocation();
 
 			return true;
 		}
@@ -180,7 +185,7 @@ extern "C" {
 	bool Get_Zoom(void* instPtr, double& zoom)
 	{
 		if (instPtr != nullptr) {
-			zoom = ((Zoom*)instPtr)->zoom;
+			zoom = ((Location*)instPtr)->zoom;
 			return true;
 		}
 		else return false;
@@ -194,7 +199,7 @@ extern "C" {
 	bool LoadLocationFromFile(void* instPtr, const char* filename)
 	{
 		if (instPtr != nullptr) {
-			((Zoom*)instPtr)->LoadZoomDataFromFile(filename);
+			((Location*)instPtr)->LoadLocationDataFromFile(filename);
 			return true;
 		}
 		else return false;
@@ -203,7 +208,7 @@ extern "C" {
 	bool SaveLocationToFile(void* instPtr, const char* filename)
 	{
 		if (instPtr != nullptr) {
-			((Zoom*)instPtr)->SaveZoomDataToFile(filename);
+			((Location*)instPtr)->SaveLocationDataToFile(filename);
 			return true;
 		}
 		else return false;
@@ -256,34 +261,9 @@ extern "C" {
 		return false;
 	}
 
-	bool GeneratePreview(void* zoomPtr, void* colorPtr, void* normPtr, void* algoPtr)
+	bool GeneratePreview(void* procPtr)
 	{
-		//DLL_EXPORT CalculationProcessor(Algorithm* algo, Normalization* m_norm, ColorPalette* color, int threads = 0);
-		CalculationProcessor proc((Algorithm*)algoPtr, (Normalization*)normPtr, (ColorPalette*)colorPtr);
-		//auto proc = ((CalculationProcessor*)instPtr);
-
-		//auto pixels = proc->m_algo->m_zoom->pixels;
-
-		//proc->m_algo->m_zoom->pixels = 500;
-
-		//proc->m_algo->m_zoom->ResetZoom();
-
-		proc.CalculatePoints("default");
-
-		// this busy wait to be fixed
-		while (proc.writingResults) {
-			Sleep(100);
-		}
-
-		// this should be not necesary to load from file here
-		proc.LoadResultFromFile("default");
-
-		proc.CreatePicture("default");
-
-		//proc->m_algo->m_zoom->pixels = pixels;
-
-		//proc->m_algo->m_zoom->ResetZoom();
-
+		((CalculationProcessor*)procPtr)->GenerateImage("default");
 		return true;
 	}
 

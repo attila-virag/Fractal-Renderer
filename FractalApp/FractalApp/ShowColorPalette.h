@@ -6,13 +6,13 @@ class ShowColorPalette : public Algorithm {
 
 public:
 
-  ShowColorPalette(Zoom* zoom) : Algorithm(zoom) { m_algoType = AlgorithmType::ShowColorPalette; }
+  ShowColorPalette(Location* zoom) : Algorithm(zoom) { m_algoType = AlgorithmType::ShowColorPalette; }
   virtual DLL_EXPORT ~ShowColorPalette() {}
 
   // this will simply range the magnitude 0 -> 1 -> 0 going left to right
-  void CalculatePoint(Result* pt) override
+  void CalculatePoint(Point* pt) override
   {
-    pt->double1 = pt->x_pixel / (double)m_zoom->pixels;
+    pt->double1 = pt->x_pixel / (double)m_location->pixels;
   }
 
 };

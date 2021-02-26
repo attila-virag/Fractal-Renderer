@@ -12,10 +12,10 @@ private:
 	const double PI = 3.14159265358979;
 
 public:
-	MandelbrotSet(Zoom* zoom, double pow = 2) : Algorithm(zoom) { m_pow = pow; m_algoType = AlgorithmType::Mandelbrot; }
+	MandelbrotSet(Location* zoom, double pow = 2) : Algorithm(zoom) { m_pow = pow; m_algoType = AlgorithmType::Mandelbrot; }
 	virtual DLL_EXPORT ~MandelbrotSet() override {}
 
 	// this method will run in multiple threads
-	void CalculatePoint(Result* pt) override;
+	void CalculatePoint(Point* pt) override;
 
 };

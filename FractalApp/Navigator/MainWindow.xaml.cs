@@ -126,7 +126,9 @@ namespace Navigator
       Display_y = calculator.Y;
       Display_scale = calculator.Scale;
       Display_pixels = calculator.Pixels;
-      SetCoordinates();
+
+      defaultImage.Source = defaultBi;
+
     }
 
     // Plus button
@@ -148,21 +150,25 @@ namespace Navigator
     private void Click_Up(object sender, RoutedEventArgs e)
     {
       Display_y = Display_y + Display_scale * 0.05;
+      //SetCoordinates();
     }
 
     private void Click_Down(object sender, RoutedEventArgs e)
     {
       Display_y = Display_y - Display_scale * 0.05;
+      //SetCoordinates();
     }
 
     private void Click_Left(object sender, RoutedEventArgs e)
     {
       Display_x = Display_x - Display_scale * 0.05;
+     // SetCoordinates();
     }
 
     private void Click_Right(object sender, RoutedEventArgs e)
     {
       Display_x = Display_x + Display_scale * 0.05;
+      //SetCoordinates();
     }
 
     private void Click_Revert(object sender, RoutedEventArgs e)

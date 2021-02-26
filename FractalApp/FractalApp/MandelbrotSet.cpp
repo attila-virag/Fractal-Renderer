@@ -3,12 +3,12 @@
 
 using namespace std;
 
-void MandelbrotSet::CalculatePoint(Result* pt)
+void MandelbrotSet::CalculatePoint(Point* pt)
 {
-	int iterationCountLimit = m_zoom->recommendedIterations;
+	int iterationCountLimit = m_location->recommendedIterations;
 
-	double x_point = m_zoom->x_min + pt->x_pixel * m_zoom->x_increment;
-	double y_point = m_zoom->y_min + pt->y_pixel * m_zoom->y_increment;
+	double x_point = m_location->x_min + pt->x_pixel * m_location->x_increment;
+	double y_point = m_location->y_min + pt->y_pixel * m_location->y_increment;
 
 	int iteration = 0;
 	double normalizedIteration = 0;
