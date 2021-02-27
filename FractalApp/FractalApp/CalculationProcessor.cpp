@@ -64,13 +64,15 @@ using std::thread;
 void CalculationProcessor::FindChanges() {
 	// this function checks if any of the previous calculation data can be reused
 	// if we have a transpose with some shared pixels from before, we reuse them
-	int pixels = m_algo->GetZoom()->pixels;
+	int pixels = m_algo->GetLocation()->pixels;
+	pointsToBeRecorded.store(pixels * pixels);
+	pixelsWritten.store(0);
 	// zoom changes will cause a recalc of everything
-	m_algo->GetZoom()->LoadLocationDataFromFile("default");
-	if (!m_lastCalculated.IsTransposeOnly(m_algo->GetZoom()->zoom)) {
+	//m_algo->GetLocation()->LoadLocationDataFromFile("default");
+	if (!m_lastCalculated.IsTransposeOnly(m_algo->GetLocation()->zoom) || m_lastCalculated.algoType != m_algo->GetLocation()->algoType) {
 		// redo all points
-		for (int h = 0; h < m_algo->GetZoom()->pixels; h++) {
-			for (int w = 0; w < m_algo->GetZoom()->pixels; w++) {
+		for (int h = 0; h < m_algo->GetLocation()->pixels; h++) {
+			for (int w = 0; w < m_algo->GetLocation()->pixels; w++) {
 				unique_ptr<Point> p(new Point());
 				p->x_pixel = w;
 				p->y_pixel = h;
@@ -80,9 +82,8 @@ void CalculationProcessor::FindChanges() {
 			}
 		}
 		// dump the previous result queue
-		m_lastCalculated.ResetLocation(m_algo->GetZoom()->x_center, m_algo->GetZoom()->y_center, m_algo->GetZoom()->zoom, m_algo->GetZoom()->pixels);
+		m_lastCalculated.ResetLocation(m_algo->GetLocation()->x_center, m_algo->GetLocation()->y_center, m_algo->GetLocation()->zoom, m_algo->GetLocation()->pixels);
 		lastResults.ClearQueue();
-		pointsToBeRecorded.store(pixels * pixels);
 		return;
 	}
 
@@ -116,8 +117,8 @@ void CalculationProcessor::FindChanges() {
 	}
 
 	// get the resulting pixels offsets
-	int dX = m_lastCalculated.GetXPixelOffset(m_algo->GetZoom()->x_center);
-	int dY = m_lastCalculated.GetYPixelOffset(m_algo->GetZoom()->y_center);
+	int dX = m_lastCalculated.GetXPixelOffset(m_algo->GetLocation()->x_center);
+	int dY = m_lastCalculated.GetYPixelOffset(m_algo->GetLocation()->y_center);
 
 	// apply the transpose where we can
 	for (int x = 0; x < pixels; x++) {
@@ -137,11 +138,12 @@ void CalculationProcessor::FindChanges() {
 
 			// else we keep the result but transpose the pixel
 			auto pt = oldGrid[x][y];
+			int newX = x - dX;
+			int newY = y - dY;
 			if (nullptr != pt) {
-				newGrid[x - dX][y - dY] = pt;
-				newGrid[x - dX][y - dY]->x_pixel = x - dX;
-				newGrid[x - dX][y - dY]->y_pixel = y - dY;
-				oldGrid[x][y] = nullptr;
+				newGrid[newX][newY] = pt;
+				newGrid[newX][newY]->x_pixel = newX;
+				newGrid[newX][newY]->y_pixel = newY;
 			}
 		}
 	}
@@ -174,8 +176,49 @@ void CalculationProcessor::FindChanges() {
 			}
 		}
 	}
-	pointsToBeRecorded.store(pixels * pixels);
-	m_lastCalculated.ResetLocation(m_algo->GetZoom()->x_center, m_algo->GetZoom()->y_center, m_algo->GetZoom()->zoom, m_algo->GetZoom()->pixels);
+
+	m_lastCalculated.ResetLocation(m_algo->GetLocation()->x_center, m_algo->GetLocation()->y_center, m_algo->GetLocation()->zoom, m_algo->GetLocation()->pixels);
+}
+
+void CalculationProcessor::Initialize()
+{
+	// kick off all the worker threads
+	workerThreadsActive.store(m_concurrency);
+	for (unsigned int t = 0; t < m_concurrency; t++) {
+		thread th = thread(&CalculationProcessor::WorkerThreadFunction, this);
+		th.detach();
+	}
+
+}
+
+// each worker thread runs this function 
+void CalculationProcessor::WorkerThreadFunction()
+{
+	for (;;) {
+
+		if (!JobActive()) {
+			// wait here until job is active
+			workerThreadsActive--;
+			std::unique_lock<std::mutex> lock(m_mu);
+			m_startCond.wait(lock, std::bind(&CalculationProcessor::JobActive, this));
+			workerThreadsActive++;
+		}
+
+		// if job is active we have one of three things to do: CalculatePoint, SaveResults, ProcessResult
+		CalculatePoint();
+
+		SaveResult();
+
+		ProcessResult();
+
+		// check if we are finished with all tasks
+		if (pixelsWritten.load() == pointsToBeRecorded.load()) {
+			jobActive.store(false);
+			std::unique_lock<std::mutex> lock(m_mu);
+			m_endCond.notify_one(); // wake up the main thread to say job is done
+		}
+
+	}
 }
 
 bool CalculationProcessor::GenerateImage(std::string fileName)
@@ -183,28 +226,31 @@ bool CalculationProcessor::GenerateImage(std::string fileName)
 	// record start time
 	startTime = GetTimeNow();
 
+	Location* loc = m_algo->GetLocation();
+	delete m_algo;
+	m_algo = Algorithm::CreateAlgorithm(loc->algoType, loc);
+
 	FindChanges();
 	PrepareRGBVectors();
-	// 
-	vector<thread> calcThreadList;
-	for (unsigned int t = 0; t < m_concurrency; t++) {
-		calcThreadList.push_back(thread(&CalculationProcessor::CalculatePoint, this, t));
+
+	// really just opensand sets up the save file
+	SaveResults(fileName);
+
+	jobActive.store(true);
+	// scope for locker
+	{
+		// wake the workers
+		std::unique_lock<std::mutex> lock(m_mu);
+		m_startCond.notify_all();
+	}
+	{ //wait here until workers done
+		std::unique_lock<std::mutex> lock(m_mu);
+		m_endCond.wait(lock, std::bind(&CalculationProcessor::JobFinished, this));
 	}
 
-	// thread to write results out to file, this will spawn multiple threads
-	std::thread rt(&CalculationProcessor::SaveResults, this, "default");
-	rt.detach();
+	outFile.close();
 
-	vector<thread> resultThreadList;
-
-	for (unsigned int t = 0; t < m_concurrency; t++) {
-		resultThreadList.push_back(thread(&CalculationProcessor::ProcessResult, this));
-	}
-
-	for_each(calcThreadList.begin(), calcThreadList.end(), std::mem_fn(&std::thread::join));
-	for_each(resultThreadList.begin(), resultThreadList.end(), std::mem_fn(&std::thread::join));
-
-	// at this point all threads should have joined
+	// at this point all threads be waiting for a new job
 	WriteImage(fileName);
 	return true;
 }
@@ -277,35 +323,27 @@ bool CalculationProcessor::GenerateImage(std::string fileName)
 //}
 
 // running one per thread, mutex to lock outfile so only one thread can write at a time
-void CalculationProcessor::SaveResult(std::mutex* mu, std::ofstream* outFile) 
+void CalculationProcessor::SaveResult() 
 {
-	while (pointsToBeRecorded.load() > 0 ) {
-		if (!toBeWritten.IsQueueEmpty()) {
-			// write result out to file
-			auto p = toBeWritten.GetNextPoint();
-			if (p == nullptr) {
-				continue;
-			}
-			// only let one thread write to the file at a time
-			std::lock_guard<mutex> locker(*mu);
-			p->Serialize(*outFile);
-			// move to write pixel queue
-			// do some data processing here - find max, min of data values
-			// also run this when loading data set
-			m_norm->CollectMinMaxData(p.get());
-			getRGBValues.AddPoint(std::move(p));
-			pointsToBeRecorded--;
+	if (!toBeWritten.IsQueueEmpty()) {
+		// write result out to file
+		auto p = toBeWritten.GetNextPoint();
+		if (p == nullptr || !outFile.is_open()) {
+			return;
 		}
-		else {
-			Sleep(2);
-		}
+		// only let one thread write to the file at a time
+		std::lock_guard<mutex> locker(outfile_mu);
+		p->Serialize(outFile);
+		// move to write pixel queue
+		// do some data processing here - find max, min of data values
+		// also run this when loading data set
+		m_norm->CollectMinMaxData(p.get());
+		getRGBValues.AddPoint(std::move(p));
 	}
 }
 
 void CalculationProcessor::SaveResults(std::string fileName)
 {
-	std::ofstream outFile;
-
 	std::string filePath = workingDirectory + "data\\" + fileName+ ".result";
 
 	outFile.open(filePath, std::ios::out | std::ios::binary);
@@ -316,28 +354,16 @@ void CalculationProcessor::SaveResults(std::string fileName)
 		return;
 	}
 
-	m_algo->GetZoom()->Serialize(outFile);
+	m_algo->GetLocation()->Serialize(outFile);
 
-	mutex mu;
-
-	vector<thread> threadList;
-	int threads = m_concurrency/2; // i am assuming since these threads are io bound we dont need as many threads as for calculations
-
-	for (unsigned int t = 0; t < threads; t++) {
-		threadList.push_back(thread(&CalculationProcessor::SaveResult, this, &mu, &outFile));
-	}
-
-	for_each(threadList.begin(), threadList.end(), std::mem_fn(&std::thread::join));
-
-	outFile.close();
 }
 
 
 // Running one per thread
-void CalculationProcessor::CalculatePoint(int threadId)
+void CalculationProcessor::CalculatePoint()
 {
 	// while there are points to be processed
-	while (!toBeCalculated.IsQueueEmpty()) {
+	if (!toBeCalculated.IsQueueEmpty()) {
 
 		// get the next available point to calculate
 		auto p = toBeCalculated.GetNextPoint();
@@ -345,7 +371,7 @@ void CalculationProcessor::CalculatePoint(int threadId)
 			if (pointsToBeCalculated.load() == 0) {
 				return;
 			}
-			continue; // we should really hit the above return in this case
+			return; // we should really hit the above return in this case
 		}
 
 		// process point via passed in method
@@ -378,11 +404,9 @@ void CalculationProcessor::SerializeResult(std::string fileName)
 // this function calculates each RGB pixel value
 void CalculationProcessor::ProcessResult() {
 
-	while (pixelsWritten.load() < m_algo->GetZoom()->pixels* m_algo->GetZoom()->pixels) {
-
 		auto p = getRGBValues.GetNextPoint();
 		if (p == nullptr) {
-			continue;
+			return;
 		}
 		
 		double value = m_norm->GetNormalization(p.get());
@@ -408,15 +432,14 @@ void CalculationProcessor::ProcessResult() {
 		lastResults.AddPoint(std::move(p));
 		pixelsWritten++;
 
-	}
 }
 
 
 void CalculationProcessor::PreparePoints()
 {
-	for (int h = 0; h < m_algo->GetZoom()->pixels; h++) {
+	for (int h = 0; h < m_algo->GetLocation()->pixels; h++) {
 
-		for (int w = 0; w < m_algo->GetZoom()->pixels; w++) {
+		for (int w = 0; w < m_algo->GetLocation()->pixels; w++) {
 
 			//AddPointToQueue(w, h);
 		}
@@ -426,14 +449,17 @@ void CalculationProcessor::PreparePoints()
 
 void CalculationProcessor::PrepareRGBVectors() 
 {
+	m_redData.clear();
+	m_greenData.clear();
+	m_blueData.clear();
 
-	for (int h = 0; h < m_algo->GetZoom()->pixels; h++) {
+	for (int h = 0; h < m_algo->GetLocation()->pixels; h++) {
 
 		vector<int> tempRed;
 		vector<int> tempGreen;
 		vector<int> tempBlue;
 
-		for (int w = 0; w < m_algo->GetZoom()->pixels; w++) {
+		for (int w = 0; w < m_algo->GetLocation()->pixels; w++) {
 			tempRed.push_back(0);
 			tempGreen.push_back(0);
 			tempBlue.push_back(0);
@@ -449,7 +475,7 @@ void CalculationProcessor::PrepareRGBVectors()
 void CalculationProcessor::WriteImage(std::string fileName)
 {
 	// order red, blue, green
-	BitmapWriter bp(m_redData, m_blueData, m_greenData, m_algo->GetZoom()->pixels, m_algo->GetZoom()->pixels);
+	BitmapWriter bp(m_redData, m_blueData, m_greenData, m_algo->GetLocation()->pixels, m_algo->GetLocation()->pixels);
 
 	bp.WriteBitmap(fileName.c_str());
 
@@ -520,10 +546,10 @@ bool CalculationProcessor::LoadPointsFromFile(std::string filename)
 	lastResults.ClearQueue();
 
 	if (inFile.is_open()) {
-		m_algo->GetZoom()->Deserialize(inFile);
-		m_lastCalculated.ResetLocation(m_algo->GetZoom()->x_center, m_algo->GetZoom()->y_center, m_algo->GetZoom()->zoom, m_algo->GetZoom()->pixels);
-		for (int i = 0; i < m_algo->GetZoom()->pixels; i++) {
-			for (int j = 0; j < m_algo->GetZoom()->pixels; j++) {
+		m_algo->GetLocation()->Deserialize(inFile);
+		m_lastCalculated.ResetLocation(m_algo->GetLocation()->x_center, m_algo->GetLocation()->y_center, m_algo->GetLocation()->zoom, m_algo->GetLocation()->pixels);
+		for (int i = 0; i < m_algo->GetLocation()->pixels; i++) {
+			for (int j = 0; j < m_algo->GetLocation()->pixels; j++) {
 				std::unique_ptr<Point> r(new Point());
 				r->Deserialize(inFile);
 				r->processed = true;

@@ -205,28 +205,61 @@ namespace UnitTests
 			}
 		}
 
+		TEST_METHOD(TestGenerateImageFromResultsFile)
+		{
+			auto pZoom = new Location(-0.773774 - 0.00099, -.11766, 0.001, 500);
+			auto pColor = new ColorPalette();
+			pColor->LoadPaletteFromFile("default");
+			auto pNorm = new Normalization(ParameterToNormalize::Int1, NormalizationMethod::SqrtSmoothing);
+			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::Mandelbrot, pZoom);
+
+			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
+			pProc->Initialize();
+			pProc->LoadPointsFromFile("testFromFile");
+
+			pProc->GenerateImage("testFromFile");
+		}
+
 		TEST_METHOD(TestGenerateMandelbrotResults)
 		{
-			auto pZoom = new Location(-0.773774, -.11766, 0.001, 500);
+			auto pZoom = new Location(-0.773774 - 0.00099, -.11766, 0.001, 500);
 			pZoom->SaveLocationDataToFile("default");
 			auto pColor = new ColorPalette();
+			pColor->LoadPaletteFromFile("BW");
 			auto pNorm = new Normalization(ParameterToNormalize::Int1, NormalizationMethod::SqrtSmoothing);
 			pColor->GenerateRandomColorPalette();
 			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::Mandelbrot, pZoom);
 
 			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
-
+			pProc->Initialize();
+			pProc->LoadPointsFromFile("test4");
 			pProc->GenerateImage("testGenerateMandelbrotResults");
 
 			// translate position and recalc
 
-			pZoom->x_center = -0.893774;
-			pZoom->y_center = -.13766;
+			pZoom->x_center = -0.773774 - 0.00099;
+			pZoom->y_center = -.11766 + 0.00005;
 
 			pZoom->ResetLocation();
 			pZoom->SaveLocationDataToFile("default");
 
 			pProc->GenerateImage("testGenerateMandelbrotResults2");
+
+			pZoom->x_center = -0.773774 - 0.00199;
+			pZoom->y_center = -.11766 + 0.00055;
+
+			pZoom->ResetLocation();
+			pZoom->SaveLocationDataToFile("default");
+
+			pProc->GenerateImage("testGenerateMandelbrotResults3");
+			pZoom->x_center = -0.773774 - 0.00199;
+			pZoom->y_center = -.11766 + 0.00155;
+
+			pZoom->ResetLocation();
+			pZoom->SaveLocationDataToFile("default");
+
+			pProc->GenerateImage("testGenerateMandelbrotResults4");
+
 		}
 
 		// this assumes we generateda file above 

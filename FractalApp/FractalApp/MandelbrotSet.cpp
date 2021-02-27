@@ -24,6 +24,9 @@ void MandelbrotSet::CalculatePoint(Point* pt)
 	}
 	else { // run escape algorithm
 		iteration = DoIterations(z, c, pt->active, iterationCountLimit, m_pow);
+		if (iteration >= iterationCountLimit) {
+			pt->active = false;
+		}
 	}
 
 	// post processing as needed, we wont bother with unescaped points since we color them black

@@ -22,7 +22,7 @@ public:
 	// this method will run in multiple threads
 	virtual void DLL_EXPORT CalculatePoint(Point* pt) = 0;
 
-	Location*  GetZoom() { return m_location; }
+	Location*  GetLocation() { return m_location; }
 
 	AlgorithmType GetAlgorithmType() { return m_algoType; }
 

@@ -14,6 +14,7 @@
 #include <memory>
 #include <mutex>
 #include <chrono>
+#include <condition_variable>
 
 using std::vector;
 using std::unique_ptr;
@@ -32,6 +33,7 @@ private:
 
 	Location m_lastCalculated;
 
+	// we pass points between the queues
 	PointQueue toBeCalculated; // to be calculated
 	PointQueue toBeWritten; // writes the data set to file
 	PointQueue getRGBValues; // this queue is used to generate RGB values based on the results
@@ -42,22 +44,17 @@ private:
 
 	unsigned int m_concurrency{ 2 };
 
-	// passes a point in queue to thread
-	//unique_ptr<Point> GetNextPoint();
+	vector<std::thread> workerThreadList;
 
-	//unique_ptr<Point> GetNextResult();
+	std::mutex m_mu;
+	std::condition_variable m_startCond;
+	std::condition_variable m_endCond;
 
-	//void AddPointToQueue(int x, int y);
-
-	//queue.empty() is not thread safe
-	//bool IsQueueEmpty();
-
-	//int GetQueueSize();
-
-	//bool IsResultQueueEmpty();
+	std::mutex outfile_mu;
+	std::ofstream outFile;
 
 	// each thread will run this method
-	void CalculatePoint(int threadId);
+	void CalculatePoint();
 
 	void ProcessResult();
 
@@ -77,9 +74,19 @@ private:
 
 	void SaveResults(std::string fileName);
 
-	void SaveResult(std::mutex* mu, std::ofstream* outFile);
+	void SaveResult();
 
 	void FindChanges();
+
+	void WorkerThreadFunction();
+
+	bool JobActive() {
+		return jobActive.load();
+	}
+
+	bool JobFinished() {
+		return !jobActive.load();
+	}
 
 public:
 
@@ -88,10 +95,13 @@ public:
 	Normalization* m_norm = nullptr;
 	ColorPalette* m_color = nullptr;
 
-	std::atomic_bool writingResults = false;
+	std::atomic_bool jobActive = false;
+	std::atomic_int workerThreadsActive = 0;
 	std::atomic_int pointsToBeCalculated;
 	std::atomic_int pointsToBeRecorded;
 	std::atomic_int pixelsWritten;
+
+	void DLL_EXPORT Initialize(); // starts worker threads
 
 	DLL_EXPORT CalculationProcessor(Algorithm* algo, Normalization* m_norm, ColorPalette* color, int threads = 0);
 
