@@ -26,6 +26,8 @@ private:
 	int numberOfColors;
 	bool cyclicColors;
 
+	int paletteLenght = 1;
+
 	std::random_device rd;
 
 	const std::string paletteDir = workingDirectory + "palettes\\";
@@ -67,6 +69,8 @@ public:
 		GenerateRandomColorPalette();
 	}
 	//ColorPalette(ColorPalette &orig){}
+
+	void DLL_EXPORT SetPaletteLenght(int l);
 
 	void DLL_EXPORT EnterPalette(vector<int> red, vector<int> green, vector<int> blue);
 

@@ -61,24 +61,95 @@ using std::thread;
 //	return pointQueue.size();
 //}
 
+
+// call every pass, prepares to be calculated queue
+void CalculationProcessor::PreparePasses() {
+	// we will do 5 passes on every image so we can appear to let the image fill in
+	// this is the rule map for which every nth pixel we take for this pass
+
+	int PixelChooser = 10; // every 10th pixel, every pass we offset by one, last pass we grab the rest
+	int pixels = m_algo->GetLocation()->pixels;
+	pointsToBeRecorded.store(pixels * pixels);
+	pixelsWritten.store(0);
+	// unravel queue into vector
+	std::vector<std::vector<Point*>>pixelGrid;
+
+	for (int x = 0; x < pixels; x++) {
+		std::vector<Point*> v;
+		for (int y = 0; y < pixels; y++) {
+			v.push_back(nullptr);
+		}
+		pixelGrid.push_back(v);
+	}
+
+	// dump data from queue into pixe grid
+		// move the data from queue to old vector
+	if (currentPass.load() == 0) { // need to fix FindChanges method to deal with this first time thing
+		while (!toBeCalculated.IsQueueEmpty()) {
+			unique_ptr<Point> p = toBeCalculated.GetNextPoint();
+			pixelGrid[p->x_pixel][p->y_pixel] = p.get();
+			p.release();
+		}
+	}
+	else {
+		while (!lastResults.IsQueueEmpty()) {
+			unique_ptr<Point> p = lastResults.GetNextPoint();
+			pixelGrid[p->x_pixel][p->y_pixel] = p.get();
+			p.release();
+		}
+		while (!toBeWritten.IsQueueEmpty()) {
+			unique_ptr<Point> p = toBeWritten.GetNextPoint();
+			pixelGrid[p->x_pixel][p->y_pixel] = p.get();
+			p.release();
+		}
+	}
+
+	// iterate through grid and grab every nth pixel to be calculated according to our rule above
+	// divide up the points into the appropriate queues
+	bool lastPass = currentPass.load() + 1 == totalPasses;
+	int pixelNumber = 0;
+	if (!lastPass) {
+		pixelNumber = currentPass.load();
+	}
+	pointsToBeCalculated.store(0);
+	for (int x = 0; x < pixels; x++) {
+		for (int y = 0; y < pixels; y++) {
+			std::unique_ptr<Point> p(pixelGrid[x][y]);
+			pixelGrid[x][y] = nullptr;
+				pixelNumber++;
+
+				bool pickPixel = PixelChooser == pixelNumber;
+				if (lastPass) {
+					pickPixel = true;
+				}
+				if (!p->processed && pickPixel) {
+					toBeCalculated.AddPoint(std::move(p));
+					pointsToBeCalculated++;
+					pixelNumber = 0;
+				}
+				else {
+					toBeWritten.AddPoint(std::move(p));
+				}
+		}
+	}
+}
+
 void CalculationProcessor::FindChanges() {
 	// this function checks if any of the previous calculation data can be reused
 	// if we have a transpose with some shared pixels from before, we reuse them
 	int pixels = m_algo->GetLocation()->pixels;
-	pointsToBeRecorded.store(pixels * pixels);
-	pixelsWritten.store(0);
+
 	// zoom changes will cause a recalc of everything
-	//m_algo->GetLocation()->LoadLocationDataFromFile("default");
 	if (!m_lastCalculated.IsTransposeOnly(m_algo->GetLocation()->zoom) || m_lastCalculated.algoType != m_algo->GetLocation()->algoType) {
-		// redo all points
 		for (int h = 0; h < m_algo->GetLocation()->pixels; h++) {
 			for (int w = 0; w < m_algo->GetLocation()->pixels; w++) {
-				unique_ptr<Point> p(new Point());
-				p->x_pixel = w;
-				p->y_pixel = h;
-				p->processed = false;
-				toBeCalculated.AddPoint(std::move(p));
-				pointsToBeCalculated++;
+				
+					unique_ptr<Point> p(new Point());
+					p->x_pixel = w;
+					p->y_pixel = h;
+					p->processed = false;
+					toBeCalculated.AddPoint(std::move(p));
+					pointsToBeCalculated++;
 			}
 		}
 		// dump the previous result queue
@@ -121,29 +192,38 @@ void CalculationProcessor::FindChanges() {
 	int dY = m_lastCalculated.GetYPixelOffset(m_algo->GetLocation()->y_center);
 
 	// apply the transpose where we can
-	for (int x = 0; x < pixels; x++) {
-		for (int y = 0; y < pixels; y++) {
-
-			// if pixels are off screen now, we delete them
-			if (x - dX < 0 || x - dX > pixels - 1) {
-				delete oldGrid[x][y];
-				oldGrid[x][y] = nullptr;
-				continue;
+	if (dX == 0 && dY == 0) {
+		for (int x = 0; x < pixels; x++) {
+			for (int y = 0; y < pixels; y++) {
+				newGrid[x][y] = oldGrid[x][y];
 			}
-			if (y - dY < 0 || y - dY > pixels - 1) {
-				delete oldGrid[x][y];
-				oldGrid[x][y] = nullptr;
-				continue;
-			}
+		}
+	}
+	else {
+		for (int x = 0; x < pixels; x++) {
+			for (int y = 0; y < pixels; y++) {
 
-			// else we keep the result but transpose the pixel
-			auto pt = oldGrid[x][y];
-			int newX = x - dX;
-			int newY = y - dY;
-			if (nullptr != pt) {
-				newGrid[newX][newY] = pt;
-				newGrid[newX][newY]->x_pixel = newX;
-				newGrid[newX][newY]->y_pixel = newY;
+				// if pixels are off screen now, we delete them
+				if (x - dX < 0 || x - dX > pixels - 1) {
+					delete oldGrid[x][y];
+					oldGrid[x][y] = nullptr;
+					continue;
+				}
+				if (y - dY < 0 || y - dY > pixels - 1) {
+					delete oldGrid[x][y];
+					oldGrid[x][y] = nullptr;
+					continue;
+				}
+
+				// else we keep the result but transpose the pixel
+				auto pt = oldGrid[x][y];
+				int newX = x - dX;
+				int newY = y - dY;
+				if (nullptr != pt) {
+					newGrid[newX][newY] = pt;
+					newGrid[newX][newY]->x_pixel = newX;
+					newGrid[newX][newY]->y_pixel = newY;
+				}
 			}
 		}
 	}
@@ -167,12 +247,12 @@ void CalculationProcessor::FindChanges() {
 		for (int y = 0; y < pixels; y++) {
 			std::unique_ptr<Point> p(newGrid[x][y]);
 			newGrid[x][y] = nullptr;
-			if (p->processed) {
-				toBeWritten.AddPoint(std::move(p));
-			}
-			else {
+			if (!p->processed) {
 				toBeCalculated.AddPoint(std::move(p));
 				pointsToBeCalculated++;
+			}
+			else {
+				toBeWritten.AddPoint(std::move(p));
 			}
 		}
 	}
@@ -182,6 +262,7 @@ void CalculationProcessor::FindChanges() {
 
 void CalculationProcessor::Initialize()
 {
+	m_lastCalculated.ResetLocation(0, 0, 0, 0);
 	// kick off all the worker threads
 	workerThreadsActive.store(m_concurrency);
 	for (unsigned int t = 0; t < m_concurrency; t++) {
@@ -208,8 +289,10 @@ void CalculationProcessor::WorkerThreadFunction()
 		CalculatePoint();
 
 		SaveResult();
-
-		ProcessResult();
+		if (pointsToBeCalculated.load() == 0) {
+			// gets the color
+			ProcessResult();
+		}
 
 		// check if we are finished with all tasks
 		if (pixelsWritten.load() == pointsToBeRecorded.load()) {
@@ -230,97 +313,46 @@ bool CalculationProcessor::GenerateImage(std::string fileName)
 	delete m_algo;
 	m_algo = Algorithm::CreateAlgorithm(loc->algoType, loc);
 
+	currentPass.store(0);
+
 	FindChanges();
 	PrepareRGBVectors();
 
-	// really just opensand sets up the save file
-	SaveResults(fileName);
-
-	jobActive.store(true);
-	// scope for locker
-	{
-		// wake the workers
-		std::unique_lock<std::mutex> lock(m_mu);
-		m_startCond.notify_all();
-	}
-	{ //wait here until workers done
-		std::unique_lock<std::mutex> lock(m_mu);
-		m_endCond.wait(lock, std::bind(&CalculationProcessor::JobFinished, this));
+	if (pointsToBeCalculated.load() == 0) {
+		currentPass.store(totalPasses-1);
 	}
 
-	outFile.close();
+	while (currentPass.load() < totalPasses) {
 
-	// at this point all threads be waiting for a new job
-	WriteImage(fileName);
+		PreparePasses();
+
+		// really just opensand sets up the save file
+		if (currentPass.load()+1 == totalPasses) {
+			SaveResults(fileName);
+		}
+
+		jobActive.store(true);
+		// scope for locker
+		{
+			// wake the workers
+			std::unique_lock<std::mutex> lock(m_mu);
+			m_startCond.notify_all();
+		}
+		{ //wait here until workers done
+			std::unique_lock<std::mutex> lock(m_mu);
+			m_endCond.wait(lock, std::bind(&CalculationProcessor::JobFinished, this));
+		}
+
+		if (currentPass.load()+1 == totalPasses) {
+			outFile.close();
+		}
+
+		// at this point all threads be waiting for a new job
+		WriteImage(fileName);
+		currentPass++;
+	}
 	return true;
 }
-//
-//// this function runs the point calculation algorithm and save the results to outfile
-//bool CalculationProcessor::CalculatePoints(const std::string& fileName)
-//{
-//	// record start time
-//	startTime = GetTimeNow();
-//
-//	// this prepares out pixels that we will calculate with Result structs
-//	for (int h = 0; h < m_algo->GetZoom()->pixels; h++) {
-//		for (int w = 0; w < m_algo->GetZoom()->pixels; w++) {
-//			AddPointToQueue(w, h);
-//		}
-//	}
-//
-//	std::thread t(&CalculationProcessor::ReportProgress, this);
-//	t.detach();
-//
-//	vector<thread> threadList;
-//
-//	for (unsigned int t = 0; t < m_concurrency; t++) {
-//		threadList.push_back(thread(&CalculationProcessor::CalculatePoint, this, t));
-//	}
-//
-//	// thread to write results out to file
-//	std::thread rt(&CalculationProcessor::SaveResults, this, fileName);
-//	rt.detach();
-//
-//	for_each(threadList.begin(), threadList.end(), std::mem_fn(&std::thread::join));
-//
-//	return true;
-//}
-//
-//void CalculationProcessor::ReportProgress()
-//{
-//	while (!IsQueueEmpty()) {
-//		long long timeNow = GetTimeNow();
-//		long long runningTime = timeNow - startTime;
-//
-//		int queueSize = GetQueueSize();
-//		double percentComplete = 100*(1.0 - (queueSize / ((double)m_algo->GetZoom()->pixels * m_algo->GetZoom()->pixels)));
-//		double resultsComplete = 100 * (resultsWritten / ((double)m_algo->GetZoom()->pixels * m_algo->GetZoom()->pixels));
-//		std::stringstream ss;
-//		ss << "Calculation Percent Complete: " << percentComplete << " Time elapsed: " << runningTime << std::endl;
-//		ss << "Results written percent complete: " << resultsComplete << std::endl;
-//		std::cout << ss.str();	
-//#ifdef _DEBUG
-//		OutputDebugStringA(ss.str().c_str());
-//#endif
-//		Sleep(20);
-//	}
-//
-//	while (!IsResultQueueEmpty()) {
-//		long long timeNow = GetTimeNow();
-//		long long runningTime = timeNow - startTime;
-//
-//		double resultsComplete = 100 * (resultsWritten / ((double)m_algo->GetZoom()->pixels * m_algo->GetZoom()->pixels));
-//		std::stringstream ss;
-//		ss << "Results written percent complete: " << resultsComplete << " Time elapsed: " << runningTime << std::endl;
-//		std::cout << ss.str();
-//#ifdef _DEBUG
-//		OutputDebugStringA(ss.str().c_str());
-//#endif
-//		Sleep(20);
-//
-//	}
-//	// we just return once done
-//}
 
 // running one per thread, mutex to lock outfile so only one thread can write at a time
 void CalculationProcessor::SaveResult() 
@@ -328,16 +360,20 @@ void CalculationProcessor::SaveResult()
 	if (!toBeWritten.IsQueueEmpty()) {
 		// write result out to file
 		auto p = toBeWritten.GetNextPoint();
-		if (p == nullptr || !outFile.is_open()) {
+		if (p == nullptr) {
 			return;
 		}
 		// only let one thread write to the file at a time
-		std::lock_guard<mutex> locker(outfile_mu);
-		p->Serialize(outFile);
+		if (currentPass.load()+1 == totalPasses && outFile.is_open()) {
+			std::lock_guard<mutex> locker(outfile_mu);
+			p->Serialize(outFile);
+		}
 		// move to write pixel queue
 		// do some data processing here - find max, min of data values
 		// also run this when loading data set
-		m_norm->CollectMinMaxData(p.get());
+		if (p->processed) {
+			m_norm->CollectMinMaxData(p.get());
+		}
 		getRGBValues.AddPoint(std::move(p));
 	}
 }
@@ -408,20 +444,21 @@ void CalculationProcessor::ProcessResult() {
 		if (p == nullptr) {
 			return;
 		}
-		
-		double value = m_norm->GetNormalization(p.get());
-
 		int red = 0;
 		int green = 0;
 		int blue = 0;
 
-		if (value == 0) {
+		double value = 0;
+		if (p->processed) {
+			value = m_norm->GetNormalization(p.get());
+		}
+		else {
 			red = 0;
 			green = 0;
 			blue = 0;
 		}
 
-		if (p->active) {
+		if (p->active && p->processed) {
 			m_color->GetColor(value, red, green, blue);
 		}
 		m_redData[p->x_pixel][p->y_pixel] = red;
@@ -492,7 +529,7 @@ CalculationProcessor::CalculationProcessor(Algorithm* algo, Normalization* norm,
 #ifdef SINGLE_THREAD
 	m_concurrency = 1;
 #else
-	auto concurrency = std::thread::hardware_concurrency()*2;
+	auto concurrency = std::thread::hardware_concurrency()+2;
 	if (concurrency > 0 && threads == 0) {
 		m_concurrency = concurrency;
 	}

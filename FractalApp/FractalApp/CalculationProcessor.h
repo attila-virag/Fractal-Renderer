@@ -78,6 +78,8 @@ private:
 
 	void FindChanges();
 
+	void PreparePasses();
+
 	void WorkerThreadFunction();
 
 	bool JobActive() {
@@ -100,6 +102,9 @@ public:
 	std::atomic_int pointsToBeCalculated;
 	std::atomic_int pointsToBeRecorded;
 	std::atomic_int pixelsWritten;
+
+	std::atomic_int currentPass = 0;
+	const int totalPasses = 10;
 
 	void DLL_EXPORT Initialize(); // starts worker threads
 

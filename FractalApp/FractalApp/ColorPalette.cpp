@@ -16,12 +16,19 @@ void ColorPalette::LinearInterpolateEx(double magnitude, int& rValue, int& gValu
 		if (magnitude > 0.5) magnitude = 1 - magnitude; // "reverse" values greater than 5 to make palette cyclic
 	}
 
-	double increment = 1 / (double)numberOfColors;
+	double increment = 1 / ((double)numberOfColors);
 
 	// we figure out between which 2 colors of our palette we want to interpolate depending on where the magnitude falls on 0-1
 	int color2 = 1;
 	while (increment * color2 < magnitude) {
 		color2++;
+		if (color2 > numberOfColors) {
+			color2 = 1;
+		}
+	}
+	// there is some logic error above, this is to safeguard
+	if (color2 == numberOfColors) {
+		color2 = numberOfColors - 1;
 	}
 	// at this point we have to have found the color region
 	// now we use our linear interpolate formula
@@ -43,6 +50,33 @@ void ColorPalette::LinearInterpolateEx(double magnitude, int& rValue, int& gValu
 	rValue = static_cast<int>(redValue);
 	gValue = static_cast<int>(greenValue);
 	bValue = static_cast<int>(blueValue);
+}
+
+void ColorPalette::SetPaletteLenght(int l)
+{
+	// this will repeat out color palette vector by palette lenght
+	vector<int> RTemp;
+	vector<int> GTemp;
+	vector<int> BTemp;
+
+	for (int i = 0; i < l; i++) {
+		for (int j = 0; j < numberOfColors; j++) {
+			RTemp.push_back(Rvalues[j]);
+			GTemp.push_back(Gvalues[j]);
+			BTemp.push_back(Bvalues[j]);
+		}
+	}
+
+	// reset our color vector to temp
+	Rvalues.clear();
+	Gvalues.clear();
+	Bvalues.clear();
+
+	Rvalues = RTemp;
+	Gvalues = GTemp;
+	Bvalues = BTemp;
+
+	numberOfColors = l * numberOfColors;
 }
 
 void ColorPalette::LinearInterpolate(double magnitude, int & rValue, int & gValue, int & bValue)

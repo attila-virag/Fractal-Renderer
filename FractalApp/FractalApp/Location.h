@@ -21,8 +21,13 @@ class DLL_EXPORT Location {
 	// completely arbitrary guesstimate function, can be changed
 	int GetRecommendedIterations() {
 		// Where did this formula come from?
-		double scale = pixels / (2 * zoom);
-		return (int)(200 * pow(log(scale), 1.25));
+		if (recommendedIterations == 0) {
+			double scale = pixels / (2 * zoom);
+			return (int)(200 * pow(log(scale), 1.25));
+		}
+		else {
+			return recommendedIterations;
+		}
 	}
 
 	int GetAlgoType() {
@@ -79,7 +84,7 @@ public:
 
 	// guesstimate based on zoom level and pizels etc
 	// iterations may need to increase the more zoomed in to generate accurate edges
-	int recommendedIterations{ 100 };
+	int recommendedIterations{ 0 };
 
 
 	AlgorithmType algoType = AlgorithmType::Mandelbrot;
@@ -117,7 +122,7 @@ public:
 		recommendedIterations = GetRecommendedIterations();
 	}
 
-	Location(double x, double y, double zoom, int pixels, AlgorithmType type = AlgorithmType::Mandelbrot):
+	Location(double x, double y, double zoom, int pixels, AlgorithmType type = AlgorithmType::Mandelbrot, int iterations = 0):
 		x_center(x),
 		y_center(y),
 		zoom(zoom),
@@ -127,6 +132,8 @@ public:
 		x_max = x_center + zoom;
 		y_min = y_center - zoom;
 		y_max = y_center + zoom;
+
+		recommendedIterations = iterations;
 
 		recommendedIterations = GetRecommendedIterations();
 		x_increment = (x_max - x_min) / (double)pixels;

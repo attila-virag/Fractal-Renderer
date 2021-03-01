@@ -66,12 +66,14 @@ namespace UnitTests
 
 		TEST_METHOD(TestCreatePaletterBitmap)
 		{
-			auto pZoom = new Location(0, 0, 1, 500);
+			auto pZoom = new Location(0, 0, 1, 500, AlgorithmType::ShowColorPalette);
 			auto pColor = new ColorPalette(20,false);
+			pColor->SetPaletteLenght(5);
 			auto pNorm = new Normalization(ParameterToNormalize::double1, NormalizationMethod::BasicNormalization);
-			pColor->GenerateRandomColorPalette();
+			//pColor->GenerateRandomColorPalette();
 			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::ShowColorPalette, pZoom);
 			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
+			pProc->Initialize();
 			pProc->GenerateImage("paletteTest");
 			//wait until we finish writing
 
@@ -207,7 +209,25 @@ namespace UnitTests
 
 		TEST_METHOD(TestGenerateImageFromResultsFile)
 		{
-			auto pZoom = new Location(-0.773774 - 0.00099, -.11766, 0.001, 500);
+			auto pZoom = new Location(-0.773774 - 0.00099, -.11766, 0.001, 800);
+			auto pColor = new ColorPalette();
+			pColor->LoadPaletteFromFile("default");
+			pColor->SetPaletteLenght(6);
+			//auto pNorm = new Normalization(ParameterToNormalize::double3, NormalizationMethod::BasicNormalization);
+			auto pNorm = new Normalization(ParameterToNormalize::Int1, NormalizationMethod::SqrtSmoothing);
+			pNorm->SetNormalizationCycle(3);
+			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::Mandelbrot, pZoom);
+
+			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
+			pProc->Initialize();
+			pProc->LoadPointsFromFile("testFromFile2");
+
+			pProc->GenerateImage("testFromFile2");
+		}
+
+		TEST_METHOD(TestGenerateImageFromResultsFileAndTranspose)
+		{
+			auto pZoom = new Location();
 			auto pColor = new ColorPalette();
 			pColor->LoadPaletteFromFile("default");
 			auto pNorm = new Normalization(ParameterToNormalize::Int1, NormalizationMethod::SqrtSmoothing);
@@ -215,50 +235,31 @@ namespace UnitTests
 
 			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
 			pProc->Initialize();
-			pProc->LoadPointsFromFile("testFromFile");
+			pProc->LoadPointsFromFile("testFromFile2");
 
-			pProc->GenerateImage("testFromFile");
+			pProc->GenerateImage("testFromFile2");
+
+			pZoom->ResetLocation(pZoom->x_center, pZoom->y_center - 0.00099, pZoom->zoom, pZoom->pixels);
+
+			pProc->GenerateImage("testFromFile3");
 		}
 
-		TEST_METHOD(TestGenerateMandelbrotResults)
+		TEST_METHOD(TestGenerateBasicMandelbrot)
 		{
-			auto pZoom = new Location(-0.773774 - 0.00099, -.11766, 0.001, 500);
-			pZoom->SaveLocationDataToFile("default");
-			auto pColor = new ColorPalette();
-			pColor->LoadPaletteFromFile("BW");
-			auto pNorm = new Normalization(ParameterToNormalize::Int1, NormalizationMethod::SqrtSmoothing);
-			pColor->GenerateRandomColorPalette();
+			//auto pZoom = new Location(-0.8, 0, 1.5, 500, AlgorithmType::Mandelbrot,1000);
+			auto pZoom = new Location(-0.773774 - 0.00099, -.11766, 0.001, 500,AlgorithmType::Mandelbrot);
+			auto pColor = new ColorPalette(20,true);
+			//pColor->LoadPaletteFromFile("default");
+			pColor->SetPaletteLenght(20);
+			auto pNorm = new Normalization(ParameterToNormalize::double3, NormalizationMethod::BasicNormalization);
+			pNorm->SetNormalizationCycle(4);
 			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::Mandelbrot, pZoom);
 
 			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
 			pProc->Initialize();
-			pProc->LoadPointsFromFile("test4");
+			//pProc->LoadPointsFromFile("testGenerateMandelbrotResults");
 			pProc->GenerateImage("testGenerateMandelbrotResults");
 
-			// translate position and recalc
-
-			pZoom->x_center = -0.773774 - 0.00099;
-			pZoom->y_center = -.11766 + 0.00005;
-
-			pZoom->ResetLocation();
-			pZoom->SaveLocationDataToFile("default");
-
-			pProc->GenerateImage("testGenerateMandelbrotResults2");
-
-			pZoom->x_center = -0.773774 - 0.00199;
-			pZoom->y_center = -.11766 + 0.00055;
-
-			pZoom->ResetLocation();
-			pZoom->SaveLocationDataToFile("default");
-
-			pProc->GenerateImage("testGenerateMandelbrotResults3");
-			pZoom->x_center = -0.773774 - 0.00199;
-			pZoom->y_center = -.11766 + 0.00155;
-
-			pZoom->ResetLocation();
-			pZoom->SaveLocationDataToFile("default");
-
-			pProc->GenerateImage("testGenerateMandelbrotResults4");
 
 		}
 
@@ -280,14 +281,16 @@ namespace UnitTests
 
 		TEST_METHOD(TestGeneratePolynomialResults)
 		{
-			auto pZoom = new Location(0, 0, 7, 3000);
-			auto pColor = new ColorPalette();
+			auto pZoom = new Location(0, 0, 7, 3000, AlgorithmType::Polynomial);
+			auto pColor = new ColorPalette(5,false);
+			pColor->SetPaletteLenght(5);
 			auto pNorm = new Normalization(ParameterToNormalize::double1, NormalizationMethod::BasicNormalization);
-			pColor->GenerateRandomColorPalette();
+			//pColor->GenerateRandomColorPalette();
 			auto pAlgo = Algorithm::CreateAlgorithm(AlgorithmType::Polynomial, pZoom);
 
 			auto pProc = new  CalculationProcessor(pAlgo, pNorm, pColor);
-
+			pProc->Initialize();
+			pProc->LoadPointsFromFile("testGeneratePolyResults");
 			pProc->GenerateImage("testGeneratePolyResults");
 		}
 
@@ -303,119 +306,6 @@ namespace UnitTests
 			pProc->LoadPointsFromFile("testGeneratePolyResults");
 
 			pProc->CreatePicture("testPolypicture");
-		}
-
-		TEST_METHOD(TestTransposeVector)
-		{
-			const int pixels = 500;
-
-			std::vector<std::vector<Point*>> oldVec;
-			std::vector<std::vector<Point*>> newVec;
-
-			std::queue<std::unique_ptr<Point>> queue1;
-			std::queue<std::unique_ptr<Point>> queue2;
-
-			for (int x = 0; x < pixels; x++) {
-				for (int y = 0; y < pixels; y++) {
-					Point* r = new Point();
-					r->x_pixel = x;
-					r->y_pixel = y;
-					r->processed = true;
-					std::unique_ptr<Point> p(r);
-					queue1.push(std::move(p));
-
-				}
-			}
-
-			// prep the old vector
-			for (int x = 0; x < pixels; x++) {
-				std::vector<Point*> t;
-				for (int y = 0; y < pixels; y++) {
-					t.push_back(nullptr);
-				}
-				oldVec.push_back(t);
-			}
-
-			// move the data from queue to old vector
-			while (!queue1.empty()) {
-				unique_ptr<Point> p = std::move(queue1.front());
-				oldVec[p->x_pixel][p->y_pixel] = p.get();
-				p.release();
-				queue1.pop();
-			}
-
-			// prep new target
-			for (int x = 0; x < pixels; x++) {
-				std::vector<Point*> t;
-				for (int y = 0; y < pixels; y++) {
-					t.push_back(nullptr);
-				}
-				newVec.push_back(t);
-			}
-
-			// move right 10 px and up 10 px
-			int dX = 10;
-			int dY = 10;
-
-			for (int x = 0; x < pixels; x++) {
-				for (int y = 0; y < pixels; y++) {
-
-					if (x - dX < 0 || x - dX > pixels-1) {
-						delete oldVec[x][y];
-						oldVec[x][y] = nullptr;
-						continue;
-					}
-					if (y - dY < 0 || y - dY > pixels-1) {
-						delete oldVec[x][y];
-						oldVec[x][y] = nullptr;
-						continue;
-					}
-
-					// else we keep the result but transpose the pixel
-
-					newVec[x - dX][y - dY] = oldVec[x][y];
-					newVec[x - dX][y - dY]->x_pixel = x - dX;
-					newVec[x - dX][y - dY]->y_pixel = y - dY;
-					oldVec[x][y] = nullptr;
-				}
-			}
-
-			for (int x = 0; x < pixels; x++) {
-				for (int y = 0; y < pixels; y++) {
-
-					if (newVec[x][y] == nullptr) {
-						Point* r = new Point();
-						r->x_pixel = x;
-						r->y_pixel = y;
-						r->processed = false;
-						newVec[x][y] = r;
-					}
-				}
-			}
-
-			// load new Vec back into queue form
-			for (int x = 0; x < pixels; x++) {
-				for (int y = 0; y < pixels; y++) {
-					std::unique_ptr<Point> p (newVec[x][y]);
-					newVec[x][y] = nullptr;
-					queue2.push(std::move(p));
-				}
-			}
-
-			// check how many points we need to recalc
-			int recalc = 0;
-			while (!queue2.empty()) {
-				unique_ptr<Point> p = std::move(queue2.front());
-				if (!p->processed) {
-					recalc++;
-				}
-				queue1.push(std::move(p));
-				queue2.pop();
-			}
-			Assert::AreEqual(recalc,9900);
-
-
-			// now same thing but move back 
 		}
 	};
 }

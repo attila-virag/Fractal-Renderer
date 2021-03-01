@@ -33,8 +33,17 @@ void MandelbrotSet::CalculatePoint(Point* pt)
 	if (pt->active) {
 		magnitude = abs(z);
 		escapeAngle = arg(z) / 2 * PI;
-		//normalizedIteration = NormalizeIterations(iteration, z, c);
-		//normalizedIteration = log10(log2(iteration / iterationCountLimit));
+
+		// apply the smooth iteration count formula
+		// http://linas.org/art-gallery/escape/escape.html
+
+		// some extra iterations to decrease the error term
+		z = std::pow(z, 2) + c;
+		z = std::pow(z, 2) + c;
+		z = std::pow(z, 2) + c;
+
+		pt->double3 = (((double)iteration + 3) - log(log(abs(z))) / log(2.0));
+		
 	}
 
 	//we will record iteration count, final angle, final magnitude

@@ -24,8 +24,10 @@ class Normalization {
 
 	double GetParameter(Point* r);
 
-	double valueMin = 0;
-	double valueMax = 0;
+	double valueMin = 1000000000000000000000.0;
+	double valueMax = -1000000000000000000000.0;
+
+	int cycles = 4;
 
 	double BasicNormalization(Point* r);
 	double SqrtSmoothing(Point* r);
@@ -33,6 +35,8 @@ class Normalization {
 public:
 
 	DLL_EXPORT Normalization(ParameterToNormalize p, NormalizationMethod m) { param = p; method = m; }
+
+	void SetNormalizationCycle(int cycles) { this->cycles = cycles; }
 
 	virtual DLL_EXPORT ~Normalization() {};
 

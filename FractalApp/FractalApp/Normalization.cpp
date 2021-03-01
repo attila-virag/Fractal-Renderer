@@ -9,7 +9,11 @@ double Normalization::BasicNormalization(Point* r)
 
 double Normalization::SqrtSmoothing(Point* r)
 {
-  return sqrt(sqrt(sqrt(BasicNormalization(r))));
+  double value = BasicNormalization(r);
+  for (int i = 0; i < cycles; i++) {
+    value = sqrt(value);
+  }
+  return value;
 }
 
 double Normalization::GetNormalization(Point* r)
